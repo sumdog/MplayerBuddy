@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<project name="MplayerBuddy" default="build" basedir="./src">
+   <description>MPlayerBuddy is a front end for mplayer that allows one to keep track of where he or she is while watching a video. It is basically a bookmark tool for media files.</description>
+   <property name="debug" value="true" overwrite="false" />
+   <target name="clean" description="remove all generated files">
+   	<delete file="MplayerBuddy.exe" failonerror="false" />
+	<delete file="MplayerBuddy.pdb" failonerror="fasle" />
+   </target>
+   <target name="build" description="compile source code">
+     <csc target="exe" output="MplayerBuddy.exe" debug="${debug}">
+       <pkg-references>
+         <package name="gtk-sharp-2.0" />
+	 <package name="dotnet" />
+       </pkg-references>
+       <sources>
+         <include name="main.cs" />
+	 <include name="lib.cs" />
+	 <include name="gui.cs" />
+	 <include name="AssemblyInfo.cs" />
+       </sources>
+     </csc>
+   </target>
+</project>
