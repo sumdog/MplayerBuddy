@@ -1,3 +1,13 @@
+/*
+ * lib.cs - MplayerBuddy
+ * author: Sumit Khanna
+ * penguindreams.org (see site for licence)
+ *
+ * Library classes for Mplayerbuddy:
+ *    Player - controls actual mplayer process, current time, etc.
+ *    Playlist - extention of Gtk:ListStore that holds Players
+ *    
+ */
 using System;
 using System.Text;
 using System.Threading;
