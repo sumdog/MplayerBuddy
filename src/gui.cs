@@ -11,6 +11,7 @@
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.IO;
 using Gtk;
 using System.Web;
 
@@ -111,7 +112,7 @@ namespace org.penguindreams.MPlayerBuddy
                 try
                 {
                     Player p = (Player)tree.Model.GetValue(i, 0);
-                    FilmPopup pop = new FilmPopup(p,store);
+                    FilmPopup pop = new FilmPopup(p,store,i);
                 }
                 catch (System.Exception)
                 {
@@ -188,10 +189,13 @@ namespace org.penguindreams.MPlayerBuddy
 
         private Player player;
 
-        public FilmPopup(Player p, ListStore store) : base()
+        private TreeIter iter;
+
+        public FilmPopup(Player p, ListStore store, TreeIter i) : base()
         {
             player = p;
             list = store;
+            iter = i;
             
             mPlay = new MenuItem("Play");
             mStop = new MenuItem("Stop");
@@ -255,10 +259,30 @@ namespace org.penguindreams.MPlayerBuddy
             }
             else if (o == mMove) 
             {
-            	
+                FileChooserDialog fcMove = new FileChooserDialog("Choose Destination", new Window("Move File..."), FileChooserAction.SelectFolder, "Cancel", ResponseType.Cancel, "Move", ResponseType.Accept);
+                switch (fcMove.Run())
+                {
+                    case (int) ResponseType.Accept:
+                        try
+                        {
+                            File.Move(player.getFile(), fcMove.Filename);
+                            list.Remove(ref iter);
+                        }
+                        catch (Exception e)
+                        {
+                            MessageDialog md = new MessageDialog(new Window("Error Moving File"), DialogFlags.DestroyWithParent, MessageType.Error, ButtonsType.Ok, e.ToString());
+                            md.Run();
+                            md.Destroy();
+                        }
+                        break;
+                    case (int) ResponseType.Cancel:
+                        break;
+                }
+                fcMove.Destroy();
             }
             else if (o == mRemove) 
             {
+                list.Remove(ref iter);
             }
         }
     }

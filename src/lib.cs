@@ -123,8 +123,10 @@ namespace org.penguindreams.MPlayerBuddy
             proc.StartInfo.Arguments = "\"" + HttpUtility.UrlDecode(file) + "\"" + args;
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.RedirectStandardOutput = true;
+            proc.StartInfo.RedirectStandardInput = true;
             proc.Start();
             StreamReader o = proc.StandardOutput;
+            StreamWriter i = proc.StandardInput;
             String l;
             while ( !proc.HasExited  )
             {
@@ -133,6 +135,7 @@ namespace org.penguindreams.MPlayerBuddy
             	//  exit too
             	if(state == player_state.STOPPED) {
             		proc.Kill();
+                    i.WriteLine(" "); //unpause the player so it will exit cleanly. 
             		break;
             	}
      
@@ -227,7 +230,7 @@ namespace org.penguindreams.MPlayerBuddy
             	}
             }
         }
-        
+       
         /* kills all running mplayer processes for application exit */
         public void killPlayers() 
         {
