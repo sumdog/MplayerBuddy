@@ -37,7 +37,7 @@ namespace org.penguindreams.MPlayerBuddy
            new TargetEntry ("text/uri-list", 0, (uint) drop_types.TARGET_URL ),             
         };
 
-        public Gui(Playlist p) : base("My Window")
+        public Gui(Playlist p) : base("MplayerBuddy")
         {
 
             tree = new TreeView();
@@ -234,6 +234,11 @@ namespace org.penguindreams.MPlayerBuddy
             Add(mRemove);
 
             mPlay.Activated += menuItemClicked;
+            mStop.Activated += menuItemClicked;
+            mRewind.Activated += menuItemClicked;
+            mFinish.Activated += menuItemClicked;
+            mMove.Activated += menuItemClicked;
+            mRemove.Activated += menuItemClicked;
 
             Popup(null, null, null, 3, Gtk.Global.CurrentEventTime);
             ShowAll();
