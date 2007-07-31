@@ -82,6 +82,23 @@ namespace org.penguindreams.MPlayerBuddy
             ShowAll();
         }
 
+
+        //check to see if the files we loaded still exist
+        public void consistanceCheck()
+        {
+            foreach (object[] row in this)
+            {
+                Player p = (Player)row[0];
+                if (!File.Exists(p.getFile))
+                {
+                    MessageDialog fileMsg = new MessageDialog(new Window("File Not Found"), DialogFlags.DestroyWithParent,
+MessageType.Warning, ButtonsType.YesNo, "The file ? was not found");
+
+                }
+            }
+        }
+
+        //this currently does not work at all
         public bool refreshTreeView()
         {
             ResizeChildren();

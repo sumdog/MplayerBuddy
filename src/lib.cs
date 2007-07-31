@@ -196,6 +196,7 @@ namespace org.penguindreams.MPlayerBuddy
                 while ((line = inp.ReadLine()) != null)
                 {
                     String[] parts = line.Split('|');
+
                     if (parts[1].Equals("F"))
                     {
                         AppendValues(new Player(parts[0],Player.player_state.FINISHED));
