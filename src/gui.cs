@@ -1,3 +1,4 @@
+
 /*
  * gui.cs - MplayerBuddy
  * author: Sumit Khanna
@@ -18,11 +19,14 @@ using System.Web;
 
 namespace org.penguindreams.MPlayerBuddy
 {
+
     public class Gui : Window
     {
 
         private TreeView tree;
         private ListStore store;
+
+        private ScrolledWindow scroller;
 
         //drag'n drop
         enum drop_types
@@ -39,45 +43,20 @@ namespace org.penguindreams.MPlayerBuddy
 
         public Gui(Playlist p) : base("MplayerBuddy")
         {
-
-            tree = new TreeView();
-
-            Gtk.TreeViewColumn colFilm = new TreeViewColumn();
-            colFilm.Title = "Film";
-            Gtk.TreeViewColumn colTime = new TreeViewColumn();
-            colTime.Title = "Time";
-
-            tree.AppendColumn(colFilm);
-            tree.AppendColumn(colTime);
-
-            CellRenderer colFilmCel = new CellRendererText();
-            colFilm.PackStart(colFilmCel, true);
-            CellRenderer colTimeCel = new CellRendererText();
-            colTime.PackStart(colTimeCel, true);
-
-            //colFilm.AddAttribute(colFilmCel, "text", 0);
-            //colTime.AddAttribute(colTimeCel, "text", 1);
-            colFilm.SetCellDataFunc(colFilmCel, new TreeCellDataFunc(renderFilmName));
-            colTime.SetCellDataFunc(colTimeCel, new TreeCellDataFunc(renderTime));
-
             store = p;
-            tree.Model = store;
-
-
-            //setup Drag'n Drop
-            //target_table 
-            Gtk.Drag.DestSet(this, Gtk.DestDefaults.All, target_table,
-                Gdk.DragAction.Copy | Gdk.DragAction.Move | Gdk.DragAction.Link);
-            this.DragDataReceived += new DragDataReceivedHandler(dataReceived);
+            tree = new PlayerTree(p);
 
             //event handlers
             this.DeleteEvent += windowClosed;
-            tree.ButtonPressEvent += new ButtonPressEventHandler(treeClick);
 
             //refresh treeview every 1/10th of a second
-            GLib.Timeout.Add(100, new GLib.TimeoutHandler(refreshTreeView));
+            //GLib.Timeout.Add(100, new GLib.TimeoutHandler(refreshTreeView));
 
-            Add(tree);
+            //window scrolling support
+            scroller = new ScrolledWindow();
+            scroller.Add(tree);
+
+            Add(scroller);
             Resize(200, 200);
             ShowAll();
         }
@@ -86,6 +65,7 @@ namespace org.penguindreams.MPlayerBuddy
         //check to see if the files we loaded still exist
         public void consistanceCheck()
         {
+            /*
             foreach (object[] row in this)
             {
                 Player p = (Player)row[0];
@@ -96,27 +76,81 @@ MessageType.Warning, ButtonsType.YesNo, "The file ? was not found");
 
                 }
             }
+             */
         }
 
-        //this currently does not work at all
-        public bool refreshTreeView()
+ 
+
+        public void windowClosed(object o,DeleteEventArgs a)
         {
-            ResizeChildren();
-            return true;
+            ((Playlist)store).killPlayers();
+            //MPLayerBuddy.savePlaylist();
+            Application.Quit();
         }
 
-        [GLib.ConnectBefore]
-        public void treeClick(object o, ButtonPressEventArgs args)
+    }
+
+
+    public class PlayerTree : TreeView
+    {
+
+        private Playlist playlist;
+
+        //drag'n drop
+        enum drop_types
+        {
+            TARGET_STRING,
+            TARGET_URL
+        };
+        static Gtk.TargetEntry[] target_table =
+        {
+           new TargetEntry ("STRING",        0, (uint) drop_types.TARGET_STRING ),
+           new TargetEntry ("text/plain",    0, (uint) drop_types.TARGET_STRING ),
+           new TargetEntry ("text/uri-list", 0, (uint) drop_types.TARGET_URL ),             
+        };
+
+        public PlayerTree(Playlist p)
+        {
+            playlist = p;
+
+            Gtk.TreeViewColumn colFilm = new TreeViewColumn();
+            colFilm.Title = "Film";
+            Gtk.TreeViewColumn colTime = new TreeViewColumn();
+            colTime.Title = "Time";
+
+            this.AppendColumn(colFilm);
+            this.AppendColumn(colTime);
+
+            CellRenderer colFilmCel = new CellRendererText();
+            colFilm.PackStart(colFilmCel, true);
+            CellRenderer colTimeCel = new CellRendererText();
+            colTime.PackStart(colTimeCel, true);
+
+            colFilm.SetCellDataFunc(colFilmCel, new TreeCellDataFunc(renderFilmName));
+            colTime.SetCellDataFunc(colTimeCel, new TreeCellDataFunc(renderTime));
+
+            this.Model = playlist;
+
+
+            //setup Drag'n Drop
+            //target_table 
+            Gtk.Drag.DestSet(this, Gtk.DestDefaults.All, target_table,
+                Gdk.DragAction.Copy | Gdk.DragAction.Move | Gdk.DragAction.Link);
+            this.DragDataReceived += new DragDataReceivedHandler(dataReceived);
+
+        }
+
+        protected override bool OnButtonPressEvent(Gdk.EventButton evnt)
         {
             TreeIter i;
-            TreeSelection s = ((TreeView)o).Selection;
+            TreeSelection s = this.Selection;
             s.GetSelected(out i);
 
-            if (args.Event.Type == Gdk.EventType.TwoButtonPress)
+            if (evnt.Type == Gdk.EventType.TwoButtonPress && evnt.Button == 1)
             {
                 try
                 {
-                    Player p = (Player)tree.Model.GetValue(i, 0);
+                    Player p = (Player)this.Model.GetValue(i, 0);
                     p.startPlayer();
                 }
                 catch (System.Exception)
@@ -124,23 +158,26 @@ MessageType.Warning, ButtonsType.YesNo, "The file ? was not found");
                     /* no item was selected. do nothing. */
                 }
             }
-            //right click popup menu
-            else if(args.Event.Type == Gdk.EventType.ButtonPress && args.Event.Button == 3) {
+            else if (evnt.Type == Gdk.EventType.ButtonPress && evnt.Button == 3)
+            {
                 try
                 {
-                    Player p = (Player)tree.Model.GetValue(i, 0);
-                    FilmPopup pop = new FilmPopup(p,store,i);
+                    Player p = (Player)this.Model.GetValue(i, 0);
+                    FilmPopup pop = new FilmPopup(p, playlist, i);
                 }
                 catch (System.Exception)
                 {
                     /* no item was selected. do nothing */
                 }
             }
+
+            return base.OnButtonPressEvent(evnt);
         }
+
 
         private void renderFilmName(TreeViewColumn col, CellRenderer cell, TreeModel m, TreeIter iter)
         {
-            Player p = (Player) m.GetValue(iter, 0);
+            Player p = (Player)m.GetValue(iter, 0);
             String f = HttpUtility.UrlDecode(p.getFile());
             (cell as CellRendererText).Text = System.IO.Path.GetFileName(f);
         }
@@ -161,7 +198,7 @@ MessageType.Warning, ButtonsType.YesNo, "The file ? was not found");
                 int min = (int)(t - hour * 3600) / 60;
                 int sec = (int)(t - (hour * 3600) - (min * 60));
 
-                String time = Convert.ToString(hour).PadLeft(2,'0') + ":" +
+                String time = Convert.ToString(hour).PadLeft(2, '0') + ":" +
                     Convert.ToString(min).PadLeft(2, '0') + ":" +
                     Convert.ToString(sec).PadLeft(2, '0');
 
@@ -169,17 +206,10 @@ MessageType.Warning, ButtonsType.YesNo, "The file ? was not found");
             }
         }
 
-        public void windowClosed(object o,DeleteEventArgs a)
-        {
-            ((Playlist)store).killPlayers();
-            //MPLayerBuddy.savePlaylist();
-            Application.Quit();
-        }
-
         public void dataReceived(object o, DragDataReceivedArgs a)
         {
             String data = System.Text.Encoding.UTF8.GetString(a.SelectionData.Data);
-            
+
             switch (a.Info)
             {
                 case (uint)drop_types.TARGET_STRING: //nautilus/gnome
@@ -189,7 +219,7 @@ MessageType.Warning, ButtonsType.YesNo, "The file ? was not found");
                     {
                         if (u.Length > 1)
                         {
-                            store.AppendValues(new Player(u, (float) 0));
+                            playlist.AppendValues(new Player(u, (float)0));
                         }
                     }
                     break;
@@ -197,6 +227,7 @@ MessageType.Warning, ButtonsType.YesNo, "The file ? was not found");
             Gtk.Drag.Finish(a.Context, true, false, a.Time);
         }
     }
+
 
     public class FilmPopup : Menu
     {
@@ -287,7 +318,11 @@ MessageType.Warning, ButtonsType.YesNo, "The file ? was not found");
                     case (int) ResponseType.Accept:
                         try
                         {
-                            File.Move(player.getFile(), fcMove.Filename);
+                            //File.Move does not support URIs. Normalize with UrlDecore to strip %20
+                            // and Uri to strip file:///
+                            //String s = HttpUtility.UrlDecode(player.getFile());
+                            String s = new Uri(HttpUtility.UrlDecode(player.getFile())).AbsolutePath;
+                            File.Move(s, fcMove.Filename);
                             list.Remove(ref iter);
                         }
                         catch (Exception e)

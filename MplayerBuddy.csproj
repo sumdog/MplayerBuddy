@@ -38,10 +38,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="gui.cs" />
-    <Compile Include="lib.cs" />
-    <Compile Include="main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\gui.cs" />
+    <Compile Include="src\lib.cs" />
+    <Compile Include="src\main.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
