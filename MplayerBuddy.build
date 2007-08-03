@@ -16,7 +16,7 @@
          <include name="main.cs" />
 	 <include name="lib.cs" />
 	 <include name="gui.cs" />
-	 <include name="AssemblyInfo.cs" />
+	 <include name="tree.cs" />
        </sources>
      </csc>
    </target>
