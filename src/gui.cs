@@ -28,6 +28,10 @@ namespace org.penguindreams.MPlayerBuddy
 
         private ScrolledWindow scroller;
 
+        private MainMenu menu;
+
+        private VBox mainbox;
+
         //drag'n drop
         enum drop_types
         {
@@ -43,6 +47,10 @@ namespace org.penguindreams.MPlayerBuddy
 
         public Gui(Playlist p) : base("MplayerBuddy")
         {
+            //setup layout
+            mainbox = new VBox();
+
+            //setup tree
             store = p;
             tree = new PlayerTree(p);
 
@@ -53,7 +61,14 @@ namespace org.penguindreams.MPlayerBuddy
             scroller = new ScrolledWindow();
             scroller.Add(tree);
 
-            Add(scroller);
+            //add menu
+            menu = new MainMenu();
+            
+            //put it together
+            mainbox.PackStart(menu,false,false,0);
+            mainbox.PackStart(scroller);
+
+            Add(mainbox);
             Resize(200, 200);
             ShowAll();
         }
@@ -65,10 +80,62 @@ namespace org.penguindreams.MPlayerBuddy
             Application.Quit();
         }
 
-    }
+    }
 
 
-    public class FilmPopup : Menu
+    //Main top menu bar
+    class MainMenu : MenuBar
+    {
+        private Menu mFile, mHelp, mConfig;
+        private MenuItem miFile, miHelp, miConfig;
+
+        //File Menu
+        private MenuItem miExit;
+
+        //config menu
+        private MenuItem miPreferences;
+
+        //help menu
+        private MenuItem miAbout;
+
+        public MainMenu() : base()
+        {
+            //menu containers
+            mFile = new Menu();
+            mHelp = new Menu();
+            mConfig = new Menu();
+
+            //Items to hold containers
+            miFile = new MenuItem("File");
+            miFile.Submenu = mFile;
+            miHelp = new MenuItem("Help");
+            miHelp.Submenu = mHelp;
+            miConfig = new MenuItem("Config");
+            miConfig.Submenu = mConfig;
+
+            //build file menu
+            miExit = new MenuItem("Exit");
+            mFile.Add(miExit);
+
+            //build config menu
+            miPreferences = new MenuItem("Preferences");
+            mConfig.Add(miPreferences);
+
+            //build help menu
+            miAbout = new MenuItem("About");
+            mHelp.Add(miAbout);
+
+            //events
+            miExit.ButtonPressEvent = 
+
+            //put it all together
+            Append(miFile);
+            Append(miConfig);
+            Append(miHelp);
+        }
+    }
+
+    class FilmPopup : Menu
     {
         private MenuItem mPlay, mStop, mRewind, mFinish, mMove, mRemove;
 

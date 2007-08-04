@@ -39,9 +39,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\config.cs" />
     <Compile Include="src\gui.cs" />
     <Compile Include="src\lib.cs" />
     <Compile Include="src\main.cs" />
+    <Compile Include="src\tree.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

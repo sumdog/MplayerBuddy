@@ -17,6 +17,7 @@
 	 <include name="lib.cs" />
 	 <include name="gui.cs" />
 	 <include name="tree.cs" />
+	 <include name="config.cs" />
        </sources>
      </csc>
    </target>

@@ -5,14 +5,16 @@
     <File filename="./src/gui.cs" />
     <File filename="./src/lib.cs" />
     <File filename="./src/main.cs" />
+    <File filename="./src/tree.cs" />
   </Files>
   <Views>
     <ViewMemento Id="MonoDevelop.Ide.Gui.Pads.ProjectPad">
       <TreeView>
         <Node expanded="True">
           <Node name="MplayerBuddy" expanded="True">
+            <Node name="References" expanded="True" />
             <Node name="src" expanded="True">
-              <Node name="gui.cs" expanded="False" selected="True" />
+              <Node name="lib.cs" expanded="False" selected="True" />
             </Node>
           </Node>
         </Node>
@@ -37,7 +39,7 @@
   <Properties>
     <Properties>
       <Property key="ActiveConfiguration" value="Debug" />
-      <Property key="ActiveWindow" value="/media/HUBBLE/cvs/MplayerBuddy/src/gui.cs" />
+      <Property key="ActiveWindow" value="/media/HUBBLE/cvs/MplayerBuddy/src/lib.cs" />
     </Properties>
   </Properties>
 </UserCombinePreferences>
