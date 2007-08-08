@@ -13,9 +13,7 @@
         <Node expanded="True">
           <Node name="MplayerBuddy" expanded="True">
             <Node name="References" expanded="True" />
-            <Node name="src" expanded="True">
-              <Node name="lib.cs" expanded="False" selected="True" />
-            </Node>
+            <Node name="src" expanded="True" selected="True" />
           </Node>
         </Node>
       </TreeView>

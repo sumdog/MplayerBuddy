@@ -126,12 +126,32 @@ namespace org.penguindreams.MPlayerBuddy
             mHelp.Add(miAbout);
 
             //events
-            miExit.ButtonPressEvent = 
+            miExit.Activated += menuItemClicked;
+            miPreferences.Activated += menuItemClicked;
+            miAbout.Activated += menuItemClicked;
 
             //put it all together
             Append(miFile);
             Append(miConfig);
             Append(miHelp);
+        }
+
+        public void menuItemClicked(object o, EventArgs a)
+        {
+            if (o == miExit) {
+                Application.Quit();
+            }
+            else if (o == miAbout) {
+                AboutDialog about = new AboutDialog();
+                about.Authors = new string[] {"Sumit Khanna"};
+                about.Copyright = "Open Source. Some rights reserved. (See website)";
+                about.Name = "MplayerBuddy";
+                about.Website = "http://penguindreams.org";
+                about.Show();
+            }
+            else if (o == miHelp) {
+                
+            }
         }
     }
 
