@@ -11,30 +11,48 @@ using System;
 using System.Text;
 using Gtk;
 
-namespace org.penguindreams.MPlayerBuddy
+namespace org.penguindreams.MplayerBuddy
 {
-    class MPLayerBuddy
+    class MplayerBuddy
     {
         static Playlist play;
 
         static Gui gui;
+        
+        public static Config conf;
+        
+        //Used for fatal errors upon loading config files
+        // ends progrma execution with exit code 1
+        static void errorOnLoad(String msg) {
+            MessageDialog m = new MessageDialog(new Window("Error"), DialogFlags.Modal, MessageType.Error, ButtonsType.Ok, msg);
+            m.Run();
+            m.Destroy();
+            System.Environment.Exit(1);
+        }
 
         static void Main(string[] args)
         {
             Application.Init();
 
+            //home dir to store conf and playlist files
             String home = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             
+            //load playlist
             try
             {
                 play = new Playlist(home + "/.mplayerbuddy.list");
             }
-            catch (System.Exception e)
+            catch (Exception)
             {
-                MessageDialog m = new MessageDialog(new Window("Error"), DialogFlags.Modal, MessageType.Error, ButtonsType.Ok, "Could not create/open playlist file.");
-                m.Run();
-                m.Destroy();
-                System.Environment.Exit(1);
+                errorOnLoad("Could not create/open playlist file.");
+            }
+            
+            //load config
+            try {
+                conf = new Config(home + "/.mplayerbuddy.config");
+            }
+            catch(Exception) {
+                errorOnLoad("Could not create/open config file.");
             }
 
             //create main window
@@ -47,16 +65,11 @@ namespace org.penguindreams.MPlayerBuddy
 
         }
 
-
+        //called every 10 seconds to save playlist
         private static bool savePlaylist() 
         {
                 play.writeFile();
                 return true;
-        }
-
-        static void errorWindowClose(object o,DeleteEventArgs a) 
-        {
-            Application.Quit();
         }
     }
 }

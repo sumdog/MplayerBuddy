@@ -15,7 +15,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Web;
 
-namespace org.penguindreams.MPlayerBuddy
+namespace org.penguindreams.MplayerBuddy
 {
 
     public class Player {
@@ -113,13 +113,13 @@ namespace org.penguindreams.MPlayerBuddy
 
         private void spawnMPlayer() 
         {
-        	String args = "";
+        	String args = " " + MplayerBuddy.conf.mplayerArgs + " ";
         	if(time != 0) {
         		args += " -ss " + time + " ";
         	}
         
             Process proc = new Process();
-            proc.StartInfo.FileName = "mplayer";
+            proc.StartInfo.FileName = (MplayerBuddy.conf.useCustomPath) ? MplayerBuddy.conf.mplayerCommand : "mplayer";
             proc.StartInfo.Arguments = "\"" + HttpUtility.UrlDecode(file) + "\"" + args;
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.RedirectStandardOutput = true;
@@ -135,7 +135,7 @@ namespace org.penguindreams.MPlayerBuddy
             	//  exit too
             	if(state == player_state.STOPPED) {
             		proc.Kill();
-                    i.WriteLine(" "); //unpause the player so it will exit cleanly. 
+                    i.WriteLine("q"); //unpause the player so it will exit cleanly. 
             		break;
             	}
      
@@ -166,9 +166,12 @@ namespace org.penguindreams.MPlayerBuddy
                     }
 
                 }
+            }//end while
+            if(proc.ExitCode != 0) {
+              //TODO: message dialog
             }
 
-        }
+        }//end spawnMplayer()
 
 
     }

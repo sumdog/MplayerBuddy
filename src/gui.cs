@@ -17,7 +17,7 @@ using Gtk;
 using System.Web;
 
 
-namespace org.penguindreams.MPlayerBuddy
+namespace org.penguindreams.MplayerBuddy
 {
 
     public class Gui : Window
@@ -69,7 +69,7 @@ namespace org.penguindreams.MPlayerBuddy
             mainbox.PackStart(scroller);
 
             Add(mainbox);
-            Resize(200, 200);
+            Resize(MplayerBuddy.conf.xSize, MplayerBuddy.conf.ySize);
             ShowAll();
         }
 
@@ -77,6 +77,13 @@ namespace org.penguindreams.MPlayerBuddy
         public void windowClosed(object o,DeleteEventArgs a)
         {
             ((Playlist)store).killPlayers();
+            if(MplayerBuddy.conf.saveSettingsOnExit) {
+                int xsize, ysize;
+                GetSize(out xsize, out ysize);
+                MplayerBuddy.conf.xSize = xsize;
+                MplayerBuddy.conf.ySize = ysize;
+                MplayerBuddy.conf.saveConfig();
+            }
             Application.Quit();
         }
 
@@ -97,9 +104,9 @@ namespace org.penguindreams.MPlayerBuddy
 
         //help menu
         private MenuItem miAbout;
-
+        
         public MainMenu() : base()
-        {
+        {      
             //menu containers
             mFile = new Menu();
             mHelp = new Menu();
@@ -149,8 +156,8 @@ namespace org.penguindreams.MPlayerBuddy
                 about.Website = "http://penguindreams.org";
                 about.Show();
             }
-            else if (o == miHelp) {
-                
+            else if (o == miPreferences) {
+                Preferences prefs = new Preferences();
             }
         }
     }

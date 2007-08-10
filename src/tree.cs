@@ -13,7 +13,7 @@ using System.IO;
 using Gtk;
 using System.Web;
 
-namespace org.penguindreams.MPlayerBuddy
+namespace org.penguindreams.MplayerBuddy
 {
 
    public class PlayerTree : TreeView

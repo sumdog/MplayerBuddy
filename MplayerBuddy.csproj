@@ -43,6 +43,7 @@
     <Compile Include="src\gui.cs" />
     <Compile Include="src\lib.cs" />
     <Compile Include="src\main.cs" />
+    <Compile Include="src\preferences.cs" />
     <Compile Include="src\tree.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

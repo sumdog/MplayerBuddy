@@ -1,3 +1,11 @@
+/*
+ * config.cs - MplayerBuddy
+ * author: Sumit Khanna
+ * penguindreams.org (see site for licence)
+ *
+ * Contains the config file handler
+ *    
+ */
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,6 +19,8 @@ namespace org.penguindreams.MplayerBuddy
         private int xpos, ypos, xsize, ysize;
 
         private string configfile, mplayerpath, mplayerargs;
+        
+        private bool saveOnExit, customPath;
 
         //read in configuration settings from a file
         // if the file doesn't exist, create it
@@ -19,10 +29,12 @@ namespace org.penguindreams.MplayerBuddy
             //set our defaults
             xpos = 100;
             ypos = 100;
-            xsize = 500;
+            xsize = 200;
             ysize = 200;
             mplayerpath = null;
             mplayerargs = "";
+            saveOnExit = true;
+            customPath = false;
 
             configfile = file;
             FileStream fs = null;
@@ -61,6 +73,12 @@ namespace org.penguindreams.MplayerBuddy
                     {
                         mplayerargs = parts[1];
                     }
+                    else if(parts[0].Equals("SAVE_ON_EXIT")) {
+                        saveOnExit = Convert.ToBoolean(parts[1]);
+                    }
+                    else if(parts[0].Equals("CUSTOM_PATH")) {
+                        customPath = Convert.ToBoolean(parts[1]);
+                    }
                     
                 }
                 inp.Close();
@@ -82,6 +100,9 @@ namespace org.penguindreams.MplayerBuddy
                     outp.WriteLine("XSIZE:{0}",xsize);
                     outp.WriteLine("YSIZE:{0}",ysize);
                     outp.WriteLine("MARGS:{0}", mplayerargs);
+                    outp.WriteLine("SAVE_ON_EXIT:{0}",saveOnExit);
+                    outp.WriteLine("CUSTOM_PATH:{0}",customPath);
+                    
                     if (mplayerpath != null)
                     {
                         outp.WriteLine("MPLAYER:{0}", mplayerpath);
@@ -132,6 +153,16 @@ namespace org.penguindreams.MplayerBuddy
         {
             get { return mplayerargs; }
             set { mplayerargs = value; }
+        }
+        
+        public bool saveSettingsOnExit {
+            get { return saveOnExit; }
+            set { saveOnExit = value; }
+        }
+        
+        public bool useCustomPath {
+            get { return customPath; }
+            set { customPath = value; }
         }
 
         //--End Properities--
