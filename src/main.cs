@@ -22,7 +22,7 @@ namespace org.penguindreams.MplayerBuddy
         public static Config conf;
         
         //Used for fatal errors upon loading config files
-        // ends progrma execution with exit code 1
+        // ends program execution with exit code 1
         static void errorOnLoad(String msg) {
             MessageDialog m = new MessageDialog(new Window("Error"), DialogFlags.Modal, MessageType.Error, ButtonsType.Ok, msg);
             m.Run();

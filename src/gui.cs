@@ -70,6 +70,7 @@ namespace org.penguindreams.MplayerBuddy
 
             Add(mainbox);
             Resize(MplayerBuddy.conf.xSize, MplayerBuddy.conf.ySize);
+            Move(MplayerBuddy.conf.xPosition,MplayerBuddy.conf.yPosition);
             ShowAll();
         }
 
@@ -78,10 +79,13 @@ namespace org.penguindreams.MplayerBuddy
         {
             ((Playlist)store).killPlayers();
             if(MplayerBuddy.conf.saveSettingsOnExit) {
-                int xsize, ysize;
+                int xsize, ysize, xpos, ypos;
+                GetPosition(out xpos,out ypos);
                 GetSize(out xsize, out ysize);
                 MplayerBuddy.conf.xSize = xsize;
                 MplayerBuddy.conf.ySize = ysize;
+                MplayerBuddy.conf.xPosition = xpos;
+                MplayerBuddy.conf.yPosition = ypos;
                 MplayerBuddy.conf.saveConfig();
             }
             Application.Quit();
@@ -121,15 +125,15 @@ namespace org.penguindreams.MplayerBuddy
             miConfig.Submenu = mConfig;
 
             //build file menu
-            miExit = new MenuItem("Exit");
+            miExit = new ImageMenuItem(Stock.Quit, null);
             mFile.Add(miExit);
 
             //build config menu
-            miPreferences = new MenuItem("Preferences");
+            miPreferences = new ImageMenuItem(Stock.Preferences, null);
             mConfig.Add(miPreferences);
 
             //build help menu
-            miAbout = new MenuItem("About");
+            miAbout = new ImageMenuItem(Stock.About, null);
             mHelp.Add(miAbout);
 
             //events
@@ -178,9 +182,10 @@ namespace org.penguindreams.MplayerBuddy
             list = store;
             iter = i;
             
-            mPlay = new MenuItem("Play");
-            mStop = new MenuItem("Stop");
-            mRewind = new MenuItem("Rewind");
+            mPlay = new ImageMenuItem(Stock.MediaPlay,null);
+            mStop = new ImageMenuItem(Stock.MediaStop,null);
+            mRewind = new ImageMenuItem(Stock.MediaRewind, null);
+            
             mFinish = new MenuItem("Finish");
             mMove = new MenuItem("Move");
             mRemove = new MenuItem("Remove");
@@ -253,7 +258,7 @@ namespace org.penguindreams.MplayerBuddy
                         {
                             //File.Move does not support URIs. Normalize with UrlDecore to strip %20
                             // and Uri to strip file:///
-                            String s = new Uri(HttpUtility.UrlDecode(player.getFile())).AbsolutePath;
+                            String s = HttpUtility.UrlDecode(new Uri(player.getFile()).AbsolutePath);
                             String filename = System.IO.Path.GetFileName(HttpUtility.UrlDecode(player.getFile()));
                             File.Move(s, System.IO.Path.Combine(fcMove.Filename,filename) );
                             list.Remove(ref iter);

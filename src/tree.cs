@@ -42,17 +42,23 @@ namespace org.penguindreams.MplayerBuddy
             colFilm.Title = "Film";
             Gtk.TreeViewColumn colTime = new TreeViewColumn();
             colTime.Title = "Time";
+            Gtk.TreeViewColumn colState = new TreeViewColumn();
+            colState.Title = "State";
 
             this.AppendColumn(colFilm);
             this.AppendColumn(colTime);
+            this.AppendColumn(colState);
 
             CellRenderer colFilmCel = new CellRendererText();
             colFilm.PackStart(colFilmCel, true);
             CellRenderer colTimeCel = new CellRendererText();
             colTime.PackStart(colTimeCel, true);
+            CellRenderer colStateCel = new CellRendererPixbuf();
+            colState.PackStart(colStateCel,true);
 
             colFilm.SetCellDataFunc(colFilmCel, new TreeCellDataFunc(renderFilmName));
             colTime.SetCellDataFunc(colTimeCel, new TreeCellDataFunc(renderTime));
+            colState.SetCellDataFunc(colStateCel, new TreeCellDataFunc(renderState));
 
             this.Model = playlist;
 
@@ -104,6 +110,27 @@ namespace org.penguindreams.MplayerBuddy
             return ret;
         }
 
+        private void renderState(TreeViewColumn col, CellRenderer cell, TreeModel m, TreeIter iter) {
+
+            Player p = (Player)m.GetValue(iter,0);
+            String stockicon = "";
+            switch(p.getState()) {
+                case Player.player_state.PLAYING:
+                    stockicon = Stock.MediaPlay;
+                    break;
+                case Player.player_state.STOPPED:
+                    stockicon = Stock.MediaStop;
+                    break;
+                case Player.player_state.PAUSED:
+                    stockicon = Stock.MediaPause;
+                    break;
+                case Player.player_state.FINISHED:
+                    stockicon = Stock.Ok;
+                    break;
+            }
+            
+            (cell as CellRendererPixbuf).Pixbuf  = this.RenderIcon(stockicon,IconSize.SmallToolbar,null);                
+        }
 
         private void renderFilmName(TreeViewColumn col, CellRenderer cell, TreeModel m, TreeIter iter)
         {

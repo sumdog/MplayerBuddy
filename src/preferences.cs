@@ -20,7 +20,7 @@ namespace org.penguindreams.MplayerBuddy
         
         private CheckButton saveOnExit, customPath;
         
-        private Button ok, cancel, saveNow;
+        private Button ok, cancel;
         
         private Entry mplayerPath, mplayerArgs;
                   
@@ -32,7 +32,6 @@ namespace org.penguindreams.MplayerBuddy
             customPath = new CheckButton("Custom mplayer Path");
             ok = new Button(Stock.Ok);
             cancel = new Button(Stock.Cancel);
-            saveNow = new Button("Save Current Settings");
             mplayerPath = new Entry(MplayerBuddy.conf.mplayerCommand);
             mplayerArgs = new Entry(MplayerBuddy.conf.mplayerArgs);
             
@@ -52,12 +51,10 @@ namespace org.penguindreams.MplayerBuddy
             //event handlers
             ok.Clicked += onClick;
             cancel.Clicked += onClick;
-            saveNow.Clicked += onClick;
             customPath.Toggled += onToggle;
             
             //put stuff together
             mainbox.PackStart(saveOnExit);
-            mainbox.PackStart(saveNow);
             mainbox.PackStart(customPath);
             mainbox.PackStart(mplayerPath);
             mainbox.PackStart(new Label("Mplayer Arguments"));
@@ -94,14 +91,6 @@ namespace org.penguindreams.MplayerBuddy
             }
             else if (o == cancel) {
                 Destroy();
-            }
-            else if (o == saveNow) {
-                
-                writeSettingsToConfig();
-                MplayerBuddy.conf.saveConfig();
-                MessageDialog m = new MessageDialog(new Window("Saved"), DialogFlags.Modal, MessageType.Info, ButtonsType.Ok, "Your settings have been saved.");
-                m.Run();
-                m.Destroy();
             }
         }
     

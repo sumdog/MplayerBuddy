@@ -84,7 +84,7 @@ namespace org.penguindreams.MplayerBuddy
 
         public void rewindPlayer()
         {
-            if (state == player_state.STOPPED)
+            if (state == player_state.STOPPED || state == player_state.FINISHED)
             {
                 time = 0;
             }
