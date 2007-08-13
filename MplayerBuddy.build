@@ -18,6 +18,7 @@
 	 <include name="gui.cs" />
 	 <include name="tree.cs" />
 	 <include name="config.cs" />
+	 <include name="preferences.cs" />
        </sources>
      </csc>
    </target>
