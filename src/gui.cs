@@ -247,6 +247,7 @@ namespace org.penguindreams.MplayerBuddy
             }
             else if (o == mFinish)
             {
+            	player.finishPlayer();
             }
             else if (o == mMove) 
             {

@@ -27,12 +27,21 @@ namespace org.penguindreams.MplayerBuddy
         private float time;
 
         private String file;
-
+        
+        private Process proc;
+        
+        private StreamReader procout;
+        
+        private StreamWriter procin;
+        
         public Player(String file)
         {
             this.file = file;
             state = player_state.STOPPED;
             time = 0;
+            proc = null;
+            procout = null;
+            procin = null;
         }
 
         public Player(String file, float time)
@@ -40,13 +49,19 @@ namespace org.penguindreams.MplayerBuddy
             this.file = file;
             this.time = time;
             state = player_state.STOPPED;
+            proc = null;
+            procout = null;
+            procin = null;
         }
 
         public Player(String file, player_state state)
         {
             this.state = state;
             this.file = file;
-            time = 0;
+            time = (state == player_state.FINISHED) ? -1 : 0;
+            proc = null;
+            procout = null;
+            procin = null;
         }
 
         public String getFile()
@@ -64,9 +79,21 @@ namespace org.penguindreams.MplayerBuddy
             return state;
         }
         
+        public void finishPlayer() {
+        	time = -1;
+        	killPlayer();
+        	state = player_state.FINISHED;
+        }
+        
         public void killPlayer() 
         {
+          if(state == player_state.PLAYING || state == player_state.PAUSED) {
+            procin.WriteLine("q");
+            procin.Flush();
+            proc.Kill();
+            proc.WaitForExit();
         	state = player_state.STOPPED;
+          }
         	
         }
 
@@ -84,13 +111,13 @@ namespace org.penguindreams.MplayerBuddy
 
         public void rewindPlayer()
         {
-            if (state == player_state.STOPPED || state == player_state.FINISHED)
-            {
-                time = 0;
+            time = 0;
+            if(state == player_state.PLAYING || state == player_state.PAUSED) {
+            	killPlayer();
+            	startPlayer();
             }
-            else
-            {
-                throw new Exception("Illegal State Change");
+            else {
+            	state = player_state.STOPPED;
             }
         }
         
@@ -118,29 +145,21 @@ namespace org.penguindreams.MplayerBuddy
         		args += " -ss " + time + " ";
         	}
         
-            Process proc = new Process();
+            proc = new Process();
             proc.StartInfo.FileName = (MplayerBuddy.conf.useCustomPath) ? MplayerBuddy.conf.mplayerCommand : "mplayer";
             proc.StartInfo.Arguments = "\"" + HttpUtility.UrlDecode(file) + "\"" + args;
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.RedirectStandardOutput = true;
             proc.StartInfo.RedirectStandardInput = true;
             proc.Start();
-            StreamReader o = proc.StandardOutput;
-            StreamWriter i = proc.StandardInput;
+            procout = proc.StandardOutput;
+            procin = proc.StandardInput;
             String l;
             while ( !proc.HasExited  )
             {
-            	//if the GUI exits, it tells the Playlist 
-            	//  to set this flag to let us know we should
-            	//  exit too
-            	if(state == player_state.STOPPED) {
-            		proc.Kill();
-                    i.WriteLine("q"); //unpause the player so it will exit cleanly. 
-            		break;
-            	}
      
-                l = readMplayerOut(o); //o.ReadLine() replacement
-                if(l.Trim().Equals("===== PAUSE =====")) {
+                l = readMplayerOut(procout); //o.ReadLine() replacement
+                if(l.Trim().Equals("=====  PAUSE  =====")) {
 					state = player_state.PAUSED;
                 }
                 else if (l.Contains("Quit"))
@@ -151,6 +170,7 @@ namespace org.penguindreams.MplayerBuddy
                 else if (l.Contains("End of file"))
                 {
                     state = player_state.FINISHED;
+                    time = -1;
                     break;
                 }
                 else if (l.StartsWith("A:"))
@@ -159,14 +179,17 @@ namespace org.penguindreams.MplayerBuddy
                     try
                     {
                         time = (float)Convert.ToDouble(parts[1].Trim('V'));
+                        state = player_state.PLAYING;
                     }
-                    catch (System.FormatException e)
+                    catch (System.FormatException)
                     {
                         /* don't care / discard */
                     }
 
                 }
+                
             }//end while
+            proc.WaitForExit();
             if(proc.ExitCode != 0) {
               //TODO: message dialog
             }

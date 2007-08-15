@@ -1,16 +1,16 @@
 <Combine name="MplayerBuddy" fileversion="2.0">
-  <Configurations active="Debug">
-    <Configuration name="Debug" ctype="CombineConfiguration">
-      <Entry build="True" name="MplayerBuddy" configuration="Debug" />
+  <Configurations active="Debug|Any CPU">
+    <Configuration name="Debug|Any CPU" ctype="CombineConfiguration">
+      <Entry build="True" name="MplayerBuddy" configuration="Debug|Any CPU" />
     </Configuration>
-    <Configuration name="Release" ctype="CombineConfiguration">
-      <Entry build="True" name="MplayerBuddy" configuration="Release" />
+    <Configuration name="Release|Any CPU" ctype="CombineConfiguration">
+      <Entry build="True" name="MplayerBuddy" configuration="Release|Any CPU" />
     </Configuration>
   </Configurations>
   <StartMode startupentry="MplayerBuddy" single="True">
     <Execute type="None" entry="MplayerBuddy" />
   </StartMode>
   <Entries>
-    <Entry filename="./MplayerBuddy.mdp" />
+    <Entry filename="./MplayerBuddy.csproj" />
   </Entries>
 </Combine>
