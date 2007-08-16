@@ -135,8 +135,7 @@ namespace org.penguindreams.MplayerBuddy
         private void renderFilmName(TreeViewColumn col, CellRenderer cell, TreeModel m, TreeIter iter)
         {
             Player p = (Player)m.GetValue(iter, 0);
-            String f = HttpUtility.UrlDecode(p.getFile());
-            (cell as CellRendererText).Text = System.IO.Path.GetFileName(f);
+            (cell as CellRendererText).Text = p.getFileName();
         }
 
         private void renderTime(TreeViewColumn col, CellRenderer cell, TreeModel m, TreeIter iter)

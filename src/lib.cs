@@ -64,9 +64,22 @@ namespace org.penguindreams.MplayerBuddy
             procin = null;
         }
 
+        /* returns full file URI */
         public String getFile()
         {
             return file;
+        }
+        
+        /* removes annoying URL encoding from filename */
+        public string getNormlaizedFile() {
+            //Normalize with UrlDecore to strip %20
+            // and Uri to strip file:///
+            return HttpUtility.UrlDecode(new Uri(file).AbsolutePath);
+        }
+        
+        /* returns just the file name */ 
+        public string getFileName() {
+            return System.IO.Path.GetFileName(HttpUtility.UrlDecode(file));
         }
 
         public float getTime()
@@ -147,7 +160,7 @@ namespace org.penguindreams.MplayerBuddy
         
             proc = new Process();
             proc.StartInfo.FileName = (MplayerBuddy.conf.useCustomPath) ? MplayerBuddy.conf.mplayerCommand : "mplayer";
-            proc.StartInfo.Arguments = "\"" + HttpUtility.UrlDecode(file) + "\"" + args;
+            proc.StartInfo.Arguments = "\"" + getNormlaizedFile() + "\"" + args;
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.RedirectStandardOutput = true;
             proc.StartInfo.RedirectStandardInput = true;
@@ -266,6 +279,15 @@ namespace org.penguindreams.MplayerBuddy
         		Player p = (Player) players[0];
         		p.killPlayer();
         	}
+        }
+        
+        /* adds player and returns false on duplicates */
+        public bool addPlayer(string file, int time, Player.player_state state) {
+            foreach(object[] players in this) {
+                Player p = (Player) players[0];
+                
+            }
+            return true;
         }
     }
 

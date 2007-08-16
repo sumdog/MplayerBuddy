@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <UserCombinePreferences filename="/media/HUBBLE/cvs/MplayerBuddy/MplayerBuddy.mds">
   <Files>
+    <File filename="Welcome" />
     <File filename="./src/config.cs" />
     <File filename="./src/gui.cs" />
     <File filename="./src/lib.cs" />
@@ -15,10 +16,10 @@
         <Node expanded="True">
           <Node name="MplayerBuddy" expanded="True">
             <Node name="References" expanded="True" />
-            <Node name="Properties" expanded="True">
-              <Node name="AssemblyInfo.cs" expanded="False" selected="True" />
+            <Node name="Properties" expanded="True" />
+            <Node name="src" expanded="True">
+              <Node name="lib.cs" expanded="False" selected="True" />
             </Node>
-            <Node name="src" expanded="True" />
           </Node>
         </Node>
       </TreeView>
@@ -41,8 +42,8 @@
   </Views>
   <Properties>
     <Properties>
-      <Property key="ActiveConfiguration" value="Debug" />
-      <Property key="ActiveWindow" value="/media/HUBBLE/cvs/MplayerBuddy/Properties/AssemblyInfo.cs" />
+      <Property key="ActiveConfiguration" value="Debug|Any CPU" />
+      <Property key="ActiveWindow" value="/media/HUBBLE/cvs/MplayerBuddy/src/lib.cs" />
     </Properties>
   </Properties>
 </UserCombinePreferences>

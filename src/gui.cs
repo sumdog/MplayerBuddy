@@ -257,11 +257,8 @@ namespace org.penguindreams.MplayerBuddy
                     case (int) ResponseType.Accept:
                         try
                         {
-                            //File.Move does not support URIs. Normalize with UrlDecore to strip %20
-                            // and Uri to strip file:///
-                            String s = HttpUtility.UrlDecode(new Uri(player.getFile()).AbsolutePath);
-                            String filename = System.IO.Path.GetFileName(HttpUtility.UrlDecode(player.getFile()));
-                            File.Move(s, System.IO.Path.Combine(fcMove.Filename,filename) );
+                            //File.Move does not support URIs. Normalize
+                            File.Move(player.getNormlaizedFile(), System.IO.Path.Combine(fcMove.Filename,player.getFileName()) );
                             list.Remove(ref iter);
                         }
                         catch (Exception e)
