@@ -164,7 +164,7 @@ namespace org.penguindreams.MplayerBuddy
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.RedirectStandardOutput = true;
             proc.StartInfo.RedirectStandardInput = true;
-            proc.Start();
+            proc.Start(); //throws Win32Exception
             procout = proc.StandardOutput;
             procin = proc.StandardInput;
             String l;
@@ -204,7 +204,7 @@ namespace org.penguindreams.MplayerBuddy
             }//end while
             proc.WaitForExit();
             if(proc.ExitCode != 0) {
-              //TODO: message dialog
+              //TODO: message dialog (oh wait I can't. I'm in a thread)
             }
 
         }//end spawnMplayer()
@@ -282,12 +282,16 @@ namespace org.penguindreams.MplayerBuddy
         }
         
         /* adds player and returns false on duplicates */
-        public bool addPlayer(string file, int time, Player.player_state state) {
+        public bool addPlayer(string file, float time) {
             foreach(object[] players in this) {
-                Player p = (Player) players[0];
-                
+                //check for duplicates
+                if( ((Player) players[0]).getFile().Equals(file)) {
+                    return false;
+                }
             }
-            return true;
+            //no duplices, so add to list
+            this.AppendValues(new Player(file, time));
+            return true; 
         }
     }
 

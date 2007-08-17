@@ -11,7 +11,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 using Gtk;
-using System.Web;
 
 namespace org.penguindreams.MplayerBuddy
 {
@@ -175,7 +174,17 @@ namespace org.penguindreams.MplayerBuddy
                     {
                         if (u.Length > 1)
                         {
-                            playlist.AppendValues(new Player(u, (float)0));
+                            if(!playlist.addPlayer(u,0)) {
+                                //duplicate, show error box
+                                MessageDialog md = new MessageDialog(new Window("Can not add file"),
+                                    DialogFlags.DestroyWithParent,
+                                    MessageType.Info,
+                                    ButtonsType.Ok,
+                                    "Could not add file {0}. The file is all ready in the playlist.",
+                                    new Player(u).getFileName());
+                                md.Run();
+                                md.Destroy();
+                            }
                         }
                     }
                     break;
