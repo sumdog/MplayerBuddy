@@ -1,0 +1,7 @@
+(2007-08-16) Version 0.51
+	* Fixed Mplayer not exiting when paused
+	* Added duplicate file checking for playlist
+	* Fixed some crashing bugs
+
+Version 0.5
+	* Initial Relase
