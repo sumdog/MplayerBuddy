@@ -99,6 +99,7 @@ namespace org.penguindreams.MplayerBuddy
                 try
                 {
                     FilmPopup pop = new FilmPopup(p, playlist, i);
+                    pop.ShowAll();
                 }
                 catch (System.Exception)
                 {
@@ -126,6 +127,9 @@ namespace org.penguindreams.MplayerBuddy
                 case Player.player_state.FINISHED:
                     stockicon = Stock.Ok;
                     break;
+                case Player.player_state.ERROR:
+                	stockicon = Stock.DialogError;
+                	break;
             }
             
             (cell as CellRendererPixbuf).Pixbuf  = this.RenderIcon(stockicon,IconSize.SmallToolbar,null);                

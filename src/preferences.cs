@@ -65,7 +65,6 @@ namespace org.penguindreams.MplayerBuddy
             Add(mainbox);
             Resize(250, 200);
             Modal = true;
-            ShowAll();
         }
         
         private void writeSettingsToConfig() {

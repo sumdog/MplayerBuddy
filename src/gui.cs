@@ -32,19 +32,6 @@ namespace org.penguindreams.MplayerBuddy
 
         private VBox mainbox;
 
-        //drag'n drop
-        enum drop_types
-        {
-            TARGET_STRING,
-            TARGET_URL
-        };
-        static Gtk.TargetEntry[] target_table =
-        {
-           new TargetEntry ("STRING",        0, (uint) drop_types.TARGET_STRING ),
-           new TargetEntry ("text/plain",    0, (uint) drop_types.TARGET_STRING ),
-           new TargetEntry ("text/uri-list", 0, (uint) drop_types.TARGET_URL ),             
-        };
-
         public Gui(Playlist p) : base("MplayerBuddy")
         {
             //setup layout
@@ -70,8 +57,7 @@ namespace org.penguindreams.MplayerBuddy
 
             Add(mainbox);
             Resize(MplayerBuddy.conf.xSize, MplayerBuddy.conf.ySize);
-            Move(MplayerBuddy.conf.xPosition,MplayerBuddy.conf.yPosition);
-            ShowAll();
+            Move(MplayerBuddy.conf.xPosition,MplayerBuddy.conf.yPosition);
         }
 
 
@@ -162,6 +148,7 @@ namespace org.penguindreams.MplayerBuddy
             }
             else if (o == miPreferences) {
                 Preferences prefs = new Preferences();
+                prefs.ShowAll();
             }
         }
     }
@@ -192,6 +179,12 @@ namespace org.penguindreams.MplayerBuddy
 
             switch (p.getState())
             {
+            	case Player.player_state.ERROR:
+                	mStop.Sensitive = false;
+                	mFinish.Sensitive = false;
+                	mMove.Sensitive = false;
+                	mRewind.Sensitive = false;
+            		break;
                 case Player.player_state.FINISHED:
                 	mPlay.Sensitive = false;
                 	mStop.Sensitive = false;
@@ -227,7 +220,6 @@ namespace org.penguindreams.MplayerBuddy
             mRemove.Activated += menuItemClicked;
 
             Popup(null, null, null, 3, Gtk.Global.CurrentEventTime);
-            ShowAll();
             
         }
 
@@ -235,7 +227,18 @@ namespace org.penguindreams.MplayerBuddy
         {
             if (o == mPlay)
             {
-                player.startPlayer();
+            	try {
+                	player.startPlayer();
+                }
+                catch(FileNotFoundException) {
+                	MessageDialog md = new MessageDialog(new Window("Could not start mplayer"),DialogFlags.DestroyWithParent,
+                		MessageType.Error,ButtonsType.YesNo,"The file {0} does not exist. Would you like to remove it from the playlist?",
+                		player.getFileName());
+                	if(md.Run() == (int) ResponseType.Yes) {
+						list.Remove(ref iter);
+                	}
+                	md.Destroy();
+                }
             }
             else if (o == mStop)
             {

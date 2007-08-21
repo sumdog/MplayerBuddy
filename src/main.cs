@@ -57,6 +57,7 @@ namespace org.penguindreams.MplayerBuddy
 
             //create main window
             gui = new Gui(play);
+            gui.ShowAll();
 
             //save playlist ever 10 seconds
             GLib.Timeout.Add(10000, new GLib.TimeoutHandler(savePlaylist));

@@ -20,7 +20,7 @@ namespace org.penguindreams.MplayerBuddy
 
     public class Player {
         
-        public enum player_state  { STOPPED , PAUSED, PLAYING , FINISHED  };
+        public enum player_state  { STOPPED , PAUSED, PLAYING , FINISHED , ERROR };
 
         private player_state state;
 
@@ -112,8 +112,12 @@ namespace org.penguindreams.MplayerBuddy
 
         public void startPlayer()
         {
-            //TODO: start player
-            if (state == player_state.STOPPED)
+            //check if the file exists
+            if(! File.Exists(this.getNormlaizedFile()) ) {
+            	state = player_state.ERROR;
+            	throw new FileNotFoundException();
+            }
+            else if (state == player_state.STOPPED)
             {
                 Thread t = new Thread(new ThreadStart(spawnMPlayer));
                 t.Start();
@@ -164,7 +168,14 @@ namespace org.penguindreams.MplayerBuddy
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.RedirectStandardOutput = true;
             proc.StartInfo.RedirectStandardInput = true;
-            proc.Start(); //throws Win32Exception
+            try {
+            	//throws Win32Exception on Windows or FileNotFound on Linux
+            	proc.Start(); 
+            }
+            catch(Exception) {
+            	//TODO: handle this
+            	state = player_state.ERROR;
+            }
             procout = proc.StandardOutput;
             procin = proc.StandardInput;
             String l;
@@ -204,7 +215,11 @@ namespace org.penguindreams.MplayerBuddy
             }//end while
             proc.WaitForExit();
             if(proc.ExitCode != 0) {
-              //TODO: message dialog (oh wait I can't. I'm in a thread)
+              //ok...this is tricky. Mplayer will NEVER exit with a code other than 0
+              // except upon a segment fault. 
+              //TODO: figure out how to handle this?
+              state = player_state.ERROR;
+              Console.WriteLine("mplayer exited with an exit code of : " + proc.ExitCode);
             }
 
         }//end spawnMplayer()
