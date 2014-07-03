@@ -1,45 +1,13 @@
-<?xml version="1.0"?>
-<UserCombinePreferences filename="/media/HUBBLE/cvs/MplayerBuddy/MplayerBuddy.mds">
-  <Files>
-    <File filename="Welcome" />
-    <File filename="./src/gui.cs" />
-    <File filename="./src/lib.cs" />
-    <File filename="./src/tree.cs" />
-    <File filename="./src/main.cs" />
-    <File filename="./src/preferences.cs" />
-  </Files>
-  <Views>
-    <ViewMemento Id="MonoDevelop.Ide.Gui.Pads.ProjectPad">
-      <TreeView>
-        <Node expanded="True">
-          <Node name="MplayerBuddy" expanded="True">
-            <Node name="src" expanded="True">
-              <Node name="gui.cs" expanded="False" selected="True" />
-            </Node>
-          </Node>
-        </Node>
-      </TreeView>
-    </ViewMemento>
-    <ViewMemento Id="MonoDevelop.Ide.Gui.Pads.ClassPad">
-      <TreeView>
-        <Node expanded="True" />
-      </TreeView>
-    </ViewMemento>
-    <ViewMemento Id="MonoQuery.DatabasePad">
-      <TreeView>
-        <Node expanded="False" />
-      </TreeView>
-    </ViewMemento>
-    <ViewMemento Id="MonoDevelop.NUnit.TestPad">
-      <TreeView>
-        <Node expanded="False" />
-      </TreeView>
-    </ViewMemento>
-  </Views>
-  <Properties>
-    <Properties>
-      <Property key="ActiveConfiguration" value="Debug|Any CPU" />
-      <Property key="ActiveWindow" value="/media/HUBBLE/cvs/MplayerBuddy/src/gui.cs" />
-    </Properties>
-  </Properties>
-</UserCombinePreferences>
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|Any CPU" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="src/gui.cs">
+    <Files>
+      <File FileName="src/gui.cs" Line="23" Column="30" />
+      <File FileName="src/lib.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
