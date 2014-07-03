@@ -142,7 +142,7 @@ namespace org.penguindreams.MplayerBuddy
                 AboutDialog about = new AboutDialog();
                 about.Authors = new string[] {"Sumit Khanna"};
                 about.Copyright = "Open Source. Some rights reserved. (See website)";
-                about.Name = "MplayerBuddy";
+                about.ProgramName = "MplayerBuddy";
                 about.Website = "http://penguindreams.org";
                 about.Show();
             }
@@ -155,7 +155,7 @@ namespace org.penguindreams.MplayerBuddy
 
     class FilmPopup : Menu
     {
-        private MenuItem mPlay, mStop, mRewind, mFinish, mMove, mRemove;
+        private MenuItem mPlay, mStop, mRewind, mFinish, mMove, mRemove, mDelete;
 
         private ListStore list;
 
@@ -172,10 +172,11 @@ namespace org.penguindreams.MplayerBuddy
             mPlay = new ImageMenuItem(Stock.MediaPlay,null);
             mStop = new ImageMenuItem(Stock.MediaStop,null);
             mRewind = new ImageMenuItem(Stock.MediaRewind, null);
-            
+            mDelete = new ImageMenuItem(Stock.Delete,null);
+			
             mFinish = new MenuItem("Finish");
             mMove = new MenuItem("Move");
-            mRemove = new MenuItem("Remove");
+            mRemove = new MenuItem("Remove");			
 
             switch (p.getState())
             {
@@ -211,6 +212,7 @@ namespace org.penguindreams.MplayerBuddy
             Add(mFinish);
             Add(mMove);
             Add(mRemove);
+			Add(mDelete);
 
             mPlay.Activated += menuItemClicked;
             mStop.Activated += menuItemClicked;
@@ -218,6 +220,7 @@ namespace org.penguindreams.MplayerBuddy
             mFinish.Activated += menuItemClicked;
             mMove.Activated += menuItemClicked;
             mRemove.Activated += menuItemClicked;
+			mDelete.Activated += menuItemClicked;
 
             Popup(null, null, null, 3, Gtk.Global.CurrentEventTime);
             
@@ -280,6 +283,23 @@ namespace org.penguindreams.MplayerBuddy
             {
                 list.Remove(ref iter);
             }
+			else if(o == mDelete) 
+			{
+				MessageDialog delConfirm = new MessageDialog(new Window("Confirm Delete"), DialogFlags.DestroyWithParent, MessageType.Question, 
+				         ButtonsType.YesNo, "Are you sure you want to delete {0}?",player.getFileName());
+				if(delConfirm.Run() == (int) ResponseType.Yes) {
+					try {
+						File.Delete(player.getNormlaizedFile());
+						list.Remove(ref iter);
+					}
+					catch(Exception e) {
+                            MessageDialog md = new MessageDialog(new Window("Error Deleting File"), DialogFlags.DestroyWithParent, MessageType.Error, ButtonsType.Ok, e.ToString());
+                            md.Run();
+                            md.Destroy();
+					}
+				}
+				delConfirm.Destroy();
+			}
         }
     }
 }

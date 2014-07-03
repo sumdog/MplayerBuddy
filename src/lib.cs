@@ -150,10 +150,68 @@ namespace org.penguindreams.MplayerBuddy
             { return r; }
             if( ((char)c) == '\r') 
             { break; }
-            r += (char)c;
+		    if( ((char)c) == '\n') 
+            { break; }
+            r += (char)c;		
           }
           return r;
         }
+		
+		private void processMplayerOutput(string line) {
+            if(line.Trim().Equals("=====  PAUSE  =====")) {
+				state = player_state.PAUSED;
+            }
+            else if (line.Contains("Quit"))
+            {
+                state = player_state.STOPPED;
+                return;
+            }
+            else if (line.Contains("End of file"))
+            {
+                state = player_state.FINISHED;
+                time = -1;
+                return;
+            }
+            else if (line.StartsWith("A:"))
+            {
+                String[] parts = line.Split(':');
+                try
+                {
+                    time = (float)Convert.ToDouble(parts[1].Trim('V'));
+                    state = player_state.PLAYING;
+                }
+                catch (System.FormatException)
+                {
+                    /* don't care / discard */
+                }
+
+            }			
+		}
+		
+		enum OutputType { STDOUT, STDERR }
+		
+		class DataThreadInfo {
+			
+			public DataThreadInfo(Process process, OutputType type) { this.process = process; this.type = type;}
+			
+			public Process process;
+			public OutputType type;
+		}
+		
+		private void readDataThread(object obj) {
+			
+			DataThreadInfo info = (DataThreadInfo)obj;
+			
+            while ( !info.process.HasExited  )
+            {     
+			  if(info.type == OutputType.STDOUT) {	
+			    processMplayerOutput(readMplayerOut(info.process.StandardOutput));
+		      }
+			  else if(info.type == OutputType.STDERR) {
+			    processMplayerOutput(readMplayerOut(info.process.StandardError)); //mplayer2 uses stderr
+			  }
+            }//end while			
+		}
 
         private void spawnMPlayer() 
         {
@@ -168,51 +226,21 @@ namespace org.penguindreams.MplayerBuddy
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.RedirectStandardOutput = true;
             proc.StartInfo.RedirectStandardInput = true;
+			proc.StartInfo.RedirectStandardError = true;
+			
             try {
             	//throws Win32Exception on Windows or FileNotFound on Linux
             	proc.Start(); 
+				Thread oo = new Thread(new ParameterizedThreadStart(readDataThread));
+			    oo.Start(new DataThreadInfo(proc,OutputType.STDOUT));
+				Thread ee = new Thread(new ParameterizedThreadStart(readDataThread));
+				ee.Start(new DataThreadInfo(proc,OutputType.STDERR));
             }
             catch(Exception) {
             	//TODO: handle this
             	state = player_state.ERROR;
             }
-            procout = proc.StandardOutput;
-            procin = proc.StandardInput;
-            String l;
-            while ( !proc.HasExited  )
-            {
-     
-                l = readMplayerOut(procout); //o.ReadLine() replacement
-                if(l.Trim().Equals("=====  PAUSE  =====")) {
-					state = player_state.PAUSED;
-                }
-                else if (l.Contains("Quit"))
-                {
-                    state = player_state.STOPPED;
-                    break;
-                }
-                else if (l.Contains("End of file"))
-                {
-                    state = player_state.FINISHED;
-                    time = -1;
-                    break;
-                }
-                else if (l.StartsWith("A:"))
-                {
-                    String[] parts = l.Split(':');
-                    try
-                    {
-                        time = (float)Convert.ToDouble(parts[1].Trim('V'));
-                        state = player_state.PLAYING;
-                    }
-                    catch (System.FormatException)
-                    {
-                        /* don't care / discard */
-                    }
-
-                }
-                
-            }//end while
+			
             proc.WaitForExit();
             if(proc.ExitCode != 0) {
               //ok...this is tricky. Mplayer will NEVER exit with a code other than 0
@@ -223,7 +251,6 @@ namespace org.penguindreams.MplayerBuddy
             }
 
         }//end spawnMplayer()
-
 
     }
 
