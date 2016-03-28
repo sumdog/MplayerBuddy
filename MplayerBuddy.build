@@ -16,6 +16,7 @@
          <include name="main.cs" />
 	 <include name="lib.cs" />
 	 <include name="gui.cs" />
+	 <include name="mpvplayer.cs" />
 	 <include name="tree.cs" />
 	 <include name="config.cs" />
 	 <include name="preferences.cs" />

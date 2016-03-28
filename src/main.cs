@@ -8,8 +8,10 @@
  *    
  */
 using System;
+using System.Diagnostics;
 using System.Text;
 using Gtk;
+using System.Runtime.InteropServices;
 
 namespace org.penguindreams.MplayerBuddy
 {
@@ -18,6 +20,8 @@ namespace org.penguindreams.MplayerBuddy
         static Playlist play;
 
         static Gui gui;
+		
+		static MPVWindow mpv;
         
         public static Config conf;
         
@@ -42,8 +46,9 @@ namespace org.penguindreams.MplayerBuddy
             {
                 play = new Playlist(home + "/.mplayerbuddy.list");
             }
-            catch (Exception)
+            catch (Exception e)
             {
+				Console.WriteLine(e);
                 errorOnLoad("Could not create/open playlist file.");
             }
             
@@ -58,9 +63,14 @@ namespace org.penguindreams.MplayerBuddy
             //create main window
             gui = new Gui(play);
             gui.ShowAll();
+			
+			mpv = new MPVWindow();
+			mpv.ShowAll ();
 
             //save playlist ever 10 seconds
             GLib.Timeout.Add(10000, new GLib.TimeoutHandler(savePlaylist));
+			
+			GLib.Timeout.Add(2000, new GLib.TimeoutHandler(testMpvPlayerAbility));
 
             Application.Run();
 
@@ -72,5 +82,44 @@ namespace org.penguindreams.MplayerBuddy
                 play.writeFile();
                 return true;
         }
+		
+		[DllImport("gdk-x11-2.0")]
+        private static extern int gdk_x11_drawable_get_xid(IntPtr drawable);
+		
+		private static bool testMpvPlayerAbility() {
+			Console.WriteLine ("mpv test");
+			Process proc;
+			proc = new Process();
+			proc.StartInfo.FileName = "/usr/bin/mpv";
+			//proc.StartInfo.Arguments = "";
+			int xwinid = gdk_x11_drawable_get_xid(mpv.GdkWindow.Handle);
+			Console.WriteLine(string.Format ("WID {0}",xwinid));
+			proc.StartInfo.Arguments = string.Format("/media/holly/webop/movies-watched-nz/wiwo_air_wifey.wmv --wid {0}", xwinid);
+            proc.StartInfo.UseShellExecute = false;
+            proc.StartInfo.RedirectStandardOutput = true;
+            proc.StartInfo.RedirectStandardInput = true;
+			proc.StartInfo.RedirectStandardError = true;
+			
+            try {
+            	//throws Win32Exception on Windows or FileNotFound on Linux
+            	proc.Start(); 
+				//Thread oo = new Thread(new ParameterizedThreadStart(readDataThread));
+			    //oo.Start(new DataThreadInfo(proc,OutputType.STDOUT));
+				//Thread ee = new Thread(new ParameterizedThreadStart(readDataThread));
+				//ee.Start(new DataThreadInfo(proc,OutputType.STDERR));
+            }
+            catch(Exception e) {
+            	//TODO: handle this
+            	//state = player_state.ERROR;
+				Console.WriteLine("Error spawning: " + e);
+            }
+			
+            proc.WaitForExit();
+			Console.WriteLine("I have exited?");
+			Console.WriteLine ("Has Exited " + proc.HasExited);
+			Console.WriteLine ("Code " + proc.ExitCode);
+			
+			return false;
+		}
     }
 }

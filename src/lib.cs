@@ -242,12 +242,13 @@ namespace org.penguindreams.MplayerBuddy
             }
 			
             proc.WaitForExit();
-            if(proc.ExitCode != 0) {
+			int exit = proc.ExitCode;
+            if(exit != 0) {
               //ok...this is tricky. Mplayer will NEVER exit with a code other than 0
               // except upon a segment fault. 
               //TODO: figure out how to handle this?
               state = player_state.ERROR;
-              Console.WriteLine("mplayer exited with an exit code of : " + proc.ExitCode);
+              Console.WriteLine("mplayer exited with an exit code of : " + exit);
             }
 
         }//end spawnMplayer()
@@ -278,7 +279,11 @@ namespace org.penguindreams.MplayerBuddy
                 {
                     String[] parts = line.Split('|');
 
-                    if (parts[1].Equals("F"))
+					if (parts.Length != 2) 
+					{
+						AppendValues(new Player(parts[0],(float)0.0));
+					}
+                    else if (parts[1].Equals("F"))
                     {
                         AppendValues(new Player(parts[0],Player.player_state.FINISHED));
                     }
