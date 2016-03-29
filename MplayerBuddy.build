@@ -12,6 +12,9 @@
          <package name="gtk-sharp-2.0" />
 	 <package name="dotnet" />
        </pkg-references>
+       <references>
+         <include name="Mono.Posix.dll" />
+       </references>
        <sources>
          <include name="main.cs" />
 	 <include name="lib.cs" />
