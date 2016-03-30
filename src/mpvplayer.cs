@@ -18,6 +18,7 @@ using System.Runtime.InteropServices;
 using System.Net;
 using System.Net.Sockets;
 using Mono.Unix;
+using System.Threading;
 
 
 namespace org.penguindreams.MplayerBuddy
@@ -50,7 +51,20 @@ namespace org.penguindreams.MplayerBuddy
 					}
 				}
 				
-				initMPVProcess ();
+				//TODO big try catch with error report
+				
+				mpvProcess = new Process ();
+				mpvProcess.StartInfo.FileName = mpvCommand;
+				mpvProcess.StartInfo.Arguments = string.Format(
+					"--wid {0} --input-unix-socket=\"{1}\" --idle ",
+					gdk_x11_drawable_get_xid(this.GdkWindow.Handle),
+					MPV_SOCKET
+				);
+				mpvProcess.StartInfo.UseShellExecute = false;
+				mpvProcess.Start();
+				
+				mpvSocket = new System.Net.Sockets.Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
+				mpvSocket.Connect(new UnixEndPoint(MPV_SOCKET));
 			}
 		}
 		
@@ -59,7 +73,6 @@ namespace org.penguindreams.MplayerBuddy
 			get { return currentFile; }
 			set {
 				currentFile = value;
-				initMPVProcess();
 			}
 		}
 		
@@ -72,31 +85,16 @@ namespace org.penguindreams.MplayerBuddy
 			currentFile = null;
 			mpvProcess = null;
 			mpvSocket = null;
+			Thread t = new Thread(new ThreadStart(socketWatcher));
+		}
+		
+		private void socketWatcher() {
+			
 		}
 		
 		[DllImport("gdk-x11-2.0")]
         private static extern int gdk_x11_drawable_get_xid(IntPtr drawable);
 		
-		private void initMPVProcess ()
-		{
-			
-			if (currentFile != null) {
-				if (mpvProcess == null) {
-					mpvProcess = new Process ();
-					mpvProcess.StartInfo.FileName = mpvCommand;
-					mpvProcess.StartInfo.Arguments = string.Format(
-						"--wid {0} --input-unix-socket=\"{1}\" \"{2}\"",
-						gdk_x11_drawable_get_xid(this.GdkWindow.Handle),
-						MPV_SOCKET,
-						currentFile
-					);
-					mpvProcess.StartInfo.UseShellExecute = false;
-					mpvProcess.Start();
-					
-					mpvSocket = new System.Net.Sockets.Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
-					mpvSocket.Connect(new UnixEndPoint(MPV_SOCKET));
-				}
-			}
-		}
+
 	}
 }
