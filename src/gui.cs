@@ -57,7 +57,8 @@ namespace org.penguindreams.MplayerBuddy
 
             Add(mainbox);
             Resize(MplayerBuddy.conf.xSize, MplayerBuddy.conf.ySize);
-            Move(MplayerBuddy.conf.xPosition,MplayerBuddy.conf.yPosition);
+            Move(MplayerBuddy.conf.xPosition,MplayerBuddy.conf.yPosition);
+
         }
 
 
