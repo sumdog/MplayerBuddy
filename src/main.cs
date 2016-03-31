@@ -63,16 +63,22 @@ namespace org.penguindreams.MplayerBuddy
             gui.ShowAll();
 			
 			mpv = new MPVWindow();
-			mpv.ShowAll ();
-
+			mpv.ShowAll();
+			//mpv.MpvCommand = MplayerBuddy.conf.mplayerCommand;
+			mpv.MpvCommand = "/usr/bin/mpv";
             //save playlist ever 10 seconds
             GLib.Timeout.Add(10000, new GLib.TimeoutHandler(savePlaylist));
 			
-			//GLib.Timeout.Add(2000, new GLib.TimeoutHandler(testMpvPlayerAbility));
+			GLib.Timeout.Add(2000, new GLib.TimeoutHandler(testMpvPlayerAbility));
 
             Application.Run();
 
         }
+
+      private static bool testMpvPlayerAbility() {
+        mpv.LoadFile("/media/holly/webop/movies-watched-nz/083.wmv");
+        return false;
+      }
 
         //called every 10 seconds to save playlist
         private static bool savePlaylist() 

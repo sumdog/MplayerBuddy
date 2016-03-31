@@ -19,6 +19,8 @@ using System.Net;
 using System.Net.Sockets;
 using Mono.Unix;
 using System.Threading;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 
 namespace org.penguindreams.MplayerBuddy
@@ -63,8 +65,10 @@ namespace org.penguindreams.MplayerBuddy
 				mpvProcess.StartInfo.UseShellExecute = false;
 				mpvProcess.Start();
 				
+        //TODO: kill off existing sockets?
 				mpvSocket = new System.Net.Sockets.Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
 				mpvSocket.Connect(new UnixEndPoint(MPV_SOCKET));
+				socketStream = new NetworkStream(mpvSocket);
 			}
 		}
 		
@@ -78,23 +82,38 @@ namespace org.penguindreams.MplayerBuddy
 		
 		private Process mpvProcess;
 		private System.Net.Sockets.Socket mpvSocket;
+		private NetworkStream socketStream;
+    private StreamWriter socketWriter;
 		
 		public MPVWindow () : base("mpv-viewer")
 		{
-			MpvCommand = MplayerBuddy.conf.mplayerCommand;
+			//MpvCommand = MplayerBuddy.conf.mplayerCommand;
 			currentFile = null;
 			mpvProcess = null;
 			mpvSocket = null;
-			Thread t = new Thread(new ThreadStart(socketWatcher));
+			Thread t = new Thread(new ThreadStart(socketReader));
 		}
+
+    public void LoadFile(String fileName) {
+        JArray cmd = new JArray();
+        cmd.Add("loadfile");
+        cmd.Add(fileName);
+        JObject o = new JObject();
+        o["command"] = cmd;
+        Console.WriteLine(o);
+        var buffer = Encoding.ASCII.GetBytes(o.ToString(Formatting.None) + "\n");
+        socketStream.Write(buffer, 0, buffer.Length);
+    }
 		
-		private void socketWatcher() {
-			
+		private void socketReader() {
+			var reader = new StreamReader(socketStream);
+			while(true) {
+			    Console.WriteLine(reader.ReadLine());
+			}
 		}
 		
 		[DllImport("gdk-x11-2.0")]
-        private static extern int gdk_x11_drawable_get_xid(IntPtr drawable);
-		
+    private static extern int gdk_x11_drawable_get_xid(IntPtr drawable);
 
 	}
 }
