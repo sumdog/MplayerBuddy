@@ -19,7 +19,7 @@ namespace org.penguindreams.MplayerBuddy {
 
     static Gui gui;
 		
-    static MPVWindow mpv;
+    public static MPVWindow mpv;
         
     public static Config conf;
         
@@ -66,14 +66,14 @@ namespace org.penguindreams.MplayerBuddy {
       //save playlist ever 10 seconds
       GLib.Timeout.Add(10000, new GLib.TimeoutHandler(savePlaylist));
 			
-      GLib.Timeout.Add(2000, new GLib.TimeoutHandler(testMpvPlayerAbility));
+      //GLib.Timeout.Add(2000, new GLib.TimeoutHandler(testMpvPlayerAbility));
 
       Application.Run();
 
     }
 
     private static bool testMpvPlayerAbility() {
-      mpv.LoadFile("/media/holly/webop/movies-watched-nz/083.wmv");
+      mpv.LoadFile("/home/skhanna/Dropbox/UA_ALL/Temporary/sensor videos/wettest2.5gallonsaminute.mp4");
       return false;
     }
 

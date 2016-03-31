@@ -107,11 +107,15 @@ namespace org.penguindreams.MplayerBuddy {
         state = player_state.ERROR;
         throw new FileNotFoundException();
       }
-      else if(state == player_state.STOPPED) {
+      else {
+        MplayerBuddy.mpv.LoadFile(getNormlaizedFile());
+        state = player_state.PLAYING;
+      }
+      /*else if(state == player_state.STOPPED) {
         Thread t = new Thread(new ThreadStart(spawnMPlayer));
         t.Start();
         state = player_state.PLAYING;
-      }
+      }*/
                 
     }
 
