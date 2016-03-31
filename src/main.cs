@@ -11,81 +11,77 @@ using System;
 using System.Text;
 using Gtk;
 
-namespace org.penguindreams.MplayerBuddy
-{
-    class MplayerBuddy
-    {
-        static Playlist play;
+namespace org.penguindreams.MplayerBuddy {
+  
+  class MplayerBuddy {
+    
+    static Playlist play;
 
-        static Gui gui;
+    static Gui gui;
 		
-		static MPVWindow mpv;
+    static MPVWindow mpv;
         
-        public static Config conf;
+    public static Config conf;
         
-        //Used for fatal errors upon loading config files
-        // ends program execution with exit code 1
-        static void errorOnLoad(String msg) {
-            MessageDialog m = new MessageDialog(new Window("Error"), DialogFlags.Modal, MessageType.Error, ButtonsType.Ok, msg);
-            m.Run();
-            m.Destroy();
-            System.Environment.Exit(1);
-        }
+    //Used for fatal errors upon loading config files
+    // ends program execution with exit code 1
+    static void errorOnLoad(String msg) {
+      MessageDialog m = new MessageDialog(new Window("Error"), DialogFlags.Modal, MessageType.Error, ButtonsType.Ok, msg);
+      m.Run();
+      m.Destroy();
+      System.Environment.Exit(1);
+    }
 
-        static void Main(string[] args)
-        {
-            Application.Init();
+    static void Main(string[] args) {
+      Application.Init();
 
-            //home dir to store conf and playlist files
-            String home = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+      //home dir to store conf and playlist files
+      String home = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             
-            //load playlist
-            try
-            {
-                play = new Playlist(home + "/.mplayerbuddy.list");
-            }
-            catch (Exception e)
-            {
-				Console.WriteLine(e);
-                errorOnLoad("Could not create/open playlist file.");
-            }
+      //load playlist
+      try {
+        play = new Playlist(home + "/.mplayerbuddy.list");
+      } 
+      catch(Exception e) {
+        Console.WriteLine(e);
+        errorOnLoad("Could not create/open playlist file.");
+      }
             
-            //load config
-            try {
-                conf = new Config(home + "/.mplayerbuddy.config");
-            }
-            catch(Exception) {
-                errorOnLoad("Could not create/open config file.");
-            }
-
-            //create main window
-            gui = new Gui(play);
-            gui.ShowAll();
-			
-			mpv = new MPVWindow();
-			mpv.ShowAll();
-			//mpv.MpvCommand = MplayerBuddy.conf.mplayerCommand;
-			mpv.MpvCommand = "/usr/bin/mpv";
-            //save playlist ever 10 seconds
-            GLib.Timeout.Add(10000, new GLib.TimeoutHandler(savePlaylist));
-			
-			GLib.Timeout.Add(2000, new GLib.TimeoutHandler(testMpvPlayerAbility));
-
-            Application.Run();
-
-        }
-
-      private static bool testMpvPlayerAbility() {
-        mpv.LoadFile("/media/holly/webop/movies-watched-nz/083.wmv");
-        return false;
+      //load config
+      try {
+        conf = new Config(home + "/.mplayerbuddy.config");
+      } 
+      catch(Exception) {
+        errorOnLoad("Could not create/open config file.");
       }
 
-        //called every 10 seconds to save playlist
-        private static bool savePlaylist() 
-        {
-                play.writeFile();
-                return true;
-        }
-		
+      //create main window
+      gui = new Gui(play);
+      gui.ShowAll();
+			
+      mpv = new MPVWindow();
+      mpv.ShowAll();
+      //mpv.MpvCommand = MplayerBuddy.conf.mplayerCommand;
+      mpv.MpvCommand = "/usr/bin/mpv";
+      //save playlist ever 10 seconds
+      GLib.Timeout.Add(10000, new GLib.TimeoutHandler(savePlaylist));
+			
+      GLib.Timeout.Add(2000, new GLib.TimeoutHandler(testMpvPlayerAbility));
+
+      Application.Run();
+
     }
+
+    private static bool testMpvPlayerAbility() {
+      mpv.LoadFile("/media/holly/webop/movies-watched-nz/083.wmv");
+      return false;
+    }
+
+    //called every 10 seconds to save playlist
+    private static bool savePlaylist() {
+      play.writeFile();
+      return true;
+    }
+		
+  }
 }
