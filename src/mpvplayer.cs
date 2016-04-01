@@ -52,6 +52,9 @@ namespace org.penguindreams.MplayerBuddy {
 				
         mpvProcess = new Process();
         mpvProcess.StartInfo.FileName = mpvCommand;
+        mpvProcess.StartInfo.RedirectStandardOutput = true;
+        mpvProcess.StartInfo.RedirectStandardInput = true;
+        mpvProcess.StartInfo.RedirectStandardError = true;
         mpvProcess.StartInfo.Arguments = string.Format(
           "--wid {0} --input-unix-socket=\"{1}\" --idle ",
           gdk_x11_drawable_get_xid(this.GdkWindow.Handle),
@@ -64,6 +67,9 @@ namespace org.penguindreams.MplayerBuddy {
         mpvSocket = new System.Net.Sockets.Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
         mpvSocket.Connect(new UnixEndPoint(MPV_SOCKET));
         socketStream = new NetworkStream(mpvSocket);
+
+        Thread t = new Thread(new ThreadStart(SocketReader));
+        t.Start();
       }
     }
 
@@ -86,24 +92,37 @@ namespace org.penguindreams.MplayerBuddy {
       currentFile = null;
       mpvProcess = null;
       mpvSocket = null;
-      Thread t = new Thread(new ThreadStart(socketReader));
+
+      GLib.Timeout.Add(1000, new GLib.TimeoutHandler(PlaybackTimeTimer));
     }
 
     public void LoadFile(String fileName) {
-      JArray cmd = new JArray();
-      cmd.Add("loadfile");
-      cmd.Add(fileName);
-      JObject o = new JObject();
-      o["command"] = cmd;
-      Console.WriteLine(o);
-      var buffer = Encoding.ASCII.GetBytes(o.ToString(Formatting.None) + "\n");
-      socketStream.Write(buffer, 0, buffer.Length);
+      WriteCommand("loadfile", fileName);
     }
 
-    private void socketReader() {
+    private bool PlaybackTimeTimer() {
+      WriteCommand("get_property", "playback-time");
+      return true;
+    }
+
+    private void WriteCommand(string command, string param) {
+      if(socketStream != null) {
+        JArray cmd = new JArray();
+        cmd.Add(command);
+        cmd.Add(param);
+        JObject o = new JObject();
+        o["command"] = cmd;
+        var buffer = Encoding.ASCII.GetBytes(o.ToString(Formatting.None) + "\n");
+        socketStream.Write(buffer, 0, buffer.Length);    
+      }
+    }
+
+    private void SocketReader() {
       var reader = new StreamReader(socketStream);
       while(true) {
-        Console.WriteLine(reader.ReadLine());
+        JObject jIn = JObject.Parse(reader.ReadLine());
+        Console.WriteLine(jIn.SelectToken("data"));
+        Console.WriteLine(jIn.SelectToken("event"));
       }
     }
 
