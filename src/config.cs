@@ -31,7 +31,7 @@ namespace org.penguindreams.MplayerBuddy
             ypos = 100;
             xsize = 200;
             ysize = 200;
-            mplayerpath = null;
+            mplayerpath = "/usr/bin/mpv";
             mplayerargs = "";
             saveOnExit = true;
             customPath = false;

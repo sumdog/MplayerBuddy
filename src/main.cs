@@ -40,7 +40,7 @@ namespace org.penguindreams.MplayerBuddy {
             
       //load playlist
       try {
-        play = new Playlist(home + "/.mplayerbuddy.list");
+        play = new Playlist(home + "/.mpvbuddy.list");
       } 
       catch(Exception e) {
         Console.WriteLine(e);
@@ -49,7 +49,7 @@ namespace org.penguindreams.MplayerBuddy {
             
       //load config
       try {
-        conf = new Config(home + "/.mplayerbuddy.config");
+        conf = new Config(home + "/.mpv.config");
       } 
       catch(Exception) {
         errorOnLoad("Could not create/open config file.");
@@ -61,22 +61,30 @@ namespace org.penguindreams.MplayerBuddy {
 			
       mpv = new MPVWindow();
       mpv.ShowAll();
-      //mpv.MpvCommand = MplayerBuddy.conf.mplayerCommand;
-      mpv.MpvCommand = "/usr/bin/mpv";
+      mpv.MpvCommand = MplayerBuddy.conf.mplayerCommand;
+      //mpv.MpvCommand = "/usr/bin/mpv";
       //save playlist ever 10 seconds
       GLib.Timeout.Add(10000, new GLib.TimeoutHandler(savePlaylist));
-			
-      //GLib.Timeout.Add(2000, new GLib.TimeoutHandler(testMpvPlayerAbility));
+
+      GLib.Timeout.Add(20000, new GLib.TimeoutHandler(FullScreenTest));
 
       Application.Run();
 
     }
 
-    private static bool testMpvPlayerAbility() {
-      mpv.LoadFile("/home/skhanna/Dropbox/UA_ALL/Temporary/sensor videos/wettest2.5gallonsaminute.mp4");
-      return false;
+    static bool fullscreen = false;
+    private static bool FullScreenTest() {
+      if(fullscreen) {
+        fullscreen = false;
+        mpv.Unfullscreen();
+      }
+      else {
+        fullscreen = true;
+        mpv.Fullscreen();
+      }
+      return true;
     }
-
+ 
     //called every 10 seconds to save playlist
     private static bool savePlaylist() {
       play.writeFile();

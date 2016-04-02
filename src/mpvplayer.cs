@@ -52,9 +52,9 @@ namespace org.penguindreams.MplayerBuddy {
 				
         mpvProcess = new Process();
         mpvProcess.StartInfo.FileName = mpvCommand;
-        mpvProcess.StartInfo.RedirectStandardOutput = true;
-        mpvProcess.StartInfo.RedirectStandardInput = true;
-        mpvProcess.StartInfo.RedirectStandardError = true;
+        //mpvProcess.StartInfo.RedirectStandardOutput = true;
+        //mpvProcess.StartInfo.RedirectStandardInput = true;
+        //mpvProcess.StartInfo.RedirectStandardError = true;
         mpvProcess.StartInfo.Arguments = string.Format(
           "--wid {0} --input-unix-socket=\"{1}\" --idle ",
           gdk_x11_drawable_get_xid(this.GdkWindow.Handle),
@@ -72,57 +72,84 @@ namespace org.penguindreams.MplayerBuddy {
         t.Start();
       }
     }
-
-    private String currentFile;
-
-    public String CurrentFile {
-      get { return currentFile; }
-      set {
-        currentFile = value;
-      }
-    }
+      
+    private Player currentPlayer;
+    private String playerLock = "";
 
     private Process mpvProcess;
     private System.Net.Sockets.Socket mpvSocket;
     private NetworkStream socketStream;
-    private StreamWriter socketWriter;
 
     public MPVWindow() : base("mpv-viewer") {
-      //MpvCommand = MplayerBuddy.conf.mplayerCommand;
-      currentFile = null;
+      currentPlayer = null;
       mpvProcess = null;
       mpvSocket = null;
 
       GLib.Timeout.Add(1000, new GLib.TimeoutHandler(PlaybackTimeTimer));
     }
 
-    public void LoadFile(String fileName) {
-      WriteCommand("loadfile", fileName);
+    public void LoadPlayer(Player play) {
+      lock(playerLock) {
+        if(!play.Equals(currentPlayer)) {
+
+          if(currentPlayer != null) {
+            //Set state to stopped
+          }
+
+          currentPlayer = play;
+          WriteCommand("loadfile", new string[] { play.getNormlaizedFile() });
+        }
+      }
     }
 
     private bool PlaybackTimeTimer() {
-      WriteCommand("get_property", "playback-time");
+      WriteCommand("get_property", new string[] {"playback-time"});
       return true;
     }
 
-    private void WriteCommand(string command, string param) {
-      if(socketStream != null) {
-        JArray cmd = new JArray();
-        cmd.Add(command);
-        cmd.Add(param);
-        JObject o = new JObject();
-        o["command"] = cmd;
-        var buffer = Encoding.ASCII.GetBytes(o.ToString(Formatting.None) + "\n");
-        socketStream.Write(buffer, 0, buffer.Length);    
+    private void WriteCommand(string command, string[] param) {
+      if(socketStream != null && currentPlayer != null) {
+        lock(playerLock) {
+          JArray cmd = new JArray();
+          cmd.Add(command);
+          foreach(string p in param){
+            cmd.Add(p);
+          }
+          JObject o = new JObject();
+          o["command"] = cmd;
+          o["request_id"] = currentPlayer.GetHashCode();
+          Console.WriteLine(o);
+          var buffer = Encoding.ASCII.GetBytes(o.ToString(Formatting.None) + "\n");
+          socketStream.Write(buffer, 0, buffer.Length);   
+        }
       }
     }
 
     private void SocketReader() {
       var reader = new StreamReader(socketStream);
       while(true) {
-        JObject jIn = JObject.Parse(reader.ReadLine());
-        Console.WriteLine(jIn.SelectToken("data"));
-        Console.WriteLine(jIn.SelectToken("event"));
+        var x = reader.ReadLine();
+        Console.WriteLine(x);
+        JObject jIn = JObject.Parse(x);
+
+        var data = jIn.SelectToken("data");
+        var evnt = jIn.SelectToken("event");
+        var requestId = jIn.SelectToken("request_id");
+
+        Console.WriteLine(string.Format("Event:{0} - Data:{1} - RequestID:{2}", evnt, data, requestId));
+
+        float time;
+
+        if(evnt != null && evnt.ToString().Equals("file-loaded")) {
+          WriteCommand("seek", new string[] { currentPlayer.Time.ToString(), "absolute+exact" });
+        }
+
+        if(data != null && float.TryParse(data.ToString(), out time))
+        {
+          if(requestId.ToString().Equals(currentPlayer.GetHashCode().ToString())) {
+            currentPlayer.Time = time;  
+          }
+        }
       }
     }
 

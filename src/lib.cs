@@ -24,6 +24,10 @@ namespace org.penguindreams.MplayerBuddy {
     private player_state state;
 
     private float time;
+    public float Time {
+      get { return time; }
+      set { time = value; }
+    }
 
     private String file;
         
@@ -77,10 +81,6 @@ namespace org.penguindreams.MplayerBuddy {
       return System.IO.Path.GetFileName(HttpUtility.UrlDecode(file));
     }
 
-    public float getTime() {
-      return time;
-    }
-
     public player_state getState() {
       return state;
     }
@@ -108,7 +108,7 @@ namespace org.penguindreams.MplayerBuddy {
         throw new FileNotFoundException();
       }
       else {
-        MplayerBuddy.mpv.LoadFile(getNormlaizedFile());
+        MplayerBuddy.mpv.LoadPlayer(this);
         state = player_state.PLAYING;
       }
       /*else if(state == player_state.STOPPED) {
@@ -288,7 +288,7 @@ namespace org.penguindreams.MplayerBuddy {
         using(StreamWriter outp = new StreamWriter(playlist)) {
           foreach(object[] row in this) {
             Player p = (Player)row[0];
-            String s = (p.getState() == Player.player_state.FINISHED) ? "F" : Convert.ToString(p.getTime());
+            String s = (p.getState() == Player.player_state.FINISHED) ? "F" : Convert.ToString(p.Time);
             outp.WriteLine(p.getFile() + "|" + s);
           }
           outp.Flush();

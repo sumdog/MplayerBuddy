@@ -197,7 +197,7 @@ namespace org.penguindreams.MplayerBuddy {
           mPlay.Sensitive = false;
           break;
       }
-      if(p.getTime() == 0) {
+      if(p.Time == 0) {
         mRewind.Sensitive = false;
       }
 

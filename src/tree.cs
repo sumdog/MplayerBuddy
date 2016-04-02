@@ -133,7 +133,7 @@ namespace org.penguindreams.MplayerBuddy {
       }
       else {
 
-        float t = p.getTime();
+        float t = p.Time;
         int hour = (int)(t / 3600);
         int min = (int)(t - hour * 3600) / 60;
         int sec = (int)(t - (hour * 3600) - (min * 60));
