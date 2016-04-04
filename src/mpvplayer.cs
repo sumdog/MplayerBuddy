@@ -102,8 +102,7 @@ namespace org.penguindreams.MplayerBuddy {
         }
       }
       else if(e.Event.Type == Gdk.EventType.ButtonPress) {
-        WriteCommand("osd-level", new string[] { "2" });
-        WriteCommand("show-progress", new string[]{} );
+        WriteCommand("osd-msg-bar", new string[]{"show-progress"} );
       }
     }
 
