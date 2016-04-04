@@ -57,10 +57,6 @@ namespace org.penguindreams.MplayerBuddy {
           gdk_x11_drawable_get_xid(this.GdkWindow.Handle),
           MPV_SOCKET
         );
-        /*mpvProcess.StartInfo.Arguments = string.Format(
-          " --input-unix-socket=\"{0}\" --idle ",
-          MPV_SOCKET
-        );*/
         mpvProcess.StartInfo.UseShellExecute = false;
         mpvProcess.Start();
 				
