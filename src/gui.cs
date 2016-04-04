@@ -22,7 +22,6 @@ namespace org.penguindreams.MplayerBuddy {
   public class Gui : Window {
 
     private TreeView tree;
-    private ListStore store;
 
     private ScrolledWindow scroller;
 
@@ -36,7 +35,6 @@ namespace org.penguindreams.MplayerBuddy {
       mainbox = new VBox();
 
       //setup tree
-      store = p;
       tree = new PlayerTree(p);
 
       //event handlers
@@ -61,8 +59,6 @@ namespace org.penguindreams.MplayerBuddy {
 
 
     public void windowClosed(object o, DeleteEventArgs a) {
-      
-      ((Playlist)store).killPlayers();
 
       if(MplayerBuddy.conf.saveSettingsOnExit) {
         int xsize, ysize, xpos, ypos;
@@ -153,7 +149,7 @@ namespace org.penguindreams.MplayerBuddy {
 
   class FilmPopup : Menu {
     
-    private MenuItem mPlay, mStop, mRewind, mFinish, mMove, mRemove, mDelete;
+    private MenuItem mPlay, mRewind, mFinish, mMove, mRemove, mDelete;
 
     private ListStore list;
 
@@ -167,7 +163,6 @@ namespace org.penguindreams.MplayerBuddy {
       iter = i;
             
       mPlay = new ImageMenuItem(Stock.MediaPlay, null);
-      mStop = new ImageMenuItem(Stock.MediaStop, null);
       mRewind = new ImageMenuItem(Stock.MediaRewind, null);
       mDelete = new ImageMenuItem(Stock.Delete, null);
 			
@@ -175,23 +170,20 @@ namespace org.penguindreams.MplayerBuddy {
       mMove = new MenuItem("Move");
       mRemove = new MenuItem("Remove");			
 
-      switch(p.getState()) {
-        case Player.player_state.ERROR:
-          mStop.Sensitive = false;
+      switch(p.State) {
+        case Player.PlayerState.ERROR:
           mFinish.Sensitive = false;
           mMove.Sensitive = false;
           mRewind.Sensitive = false;
           break;
-        case Player.player_state.FINISHED:
+        case Player.PlayerState.FINISHED:
           mPlay.Sensitive = false;
-          mStop.Sensitive = false;
           mFinish.Sensitive = false;
           break;
-        case Player.player_state.STOPPED:
-          mStop.Sensitive = false;
+        case Player.PlayerState.STOPPED:
           break;
-        case Player.player_state.PAUSED:
-        case Player.player_state.PLAYING:
+        case Player.PlayerState.PAUSED:
+        case Player.PlayerState.PLAYING:
           mMove.Sensitive = false;
           mRemove.Sensitive = false;
           mPlay.Sensitive = false;
@@ -202,7 +194,6 @@ namespace org.penguindreams.MplayerBuddy {
       }
 
       Add(mPlay);
-      Add(mStop);
       Add(mRewind);
       Add(mFinish);
       Add(mMove);
@@ -210,7 +201,6 @@ namespace org.penguindreams.MplayerBuddy {
       Add(mDelete);
 
       mPlay.Activated += menuItemClicked;
-      mStop.Activated += menuItemClicked;
       mRewind.Activated += menuItemClicked;
       mFinish.Activated += menuItemClicked;
       mMove.Activated += menuItemClicked;
@@ -235,9 +225,6 @@ namespace org.penguindreams.MplayerBuddy {
           }
           md.Destroy();
         }
-      }
-      else if(o == mStop) {
-        player.killPlayer();
       }
       else if(o == mRewind) {
         player.rewindPlayer();

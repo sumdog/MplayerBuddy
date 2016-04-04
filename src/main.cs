@@ -62,27 +62,12 @@ namespace org.penguindreams.MplayerBuddy {
       mpv = new MPVWindow();
       mpv.ShowAll();
       mpv.MpvCommand = MplayerBuddy.conf.mplayerCommand;
-      //mpv.MpvCommand = "/usr/bin/mpv";
+
       //save playlist ever 10 seconds
       GLib.Timeout.Add(10000, new GLib.TimeoutHandler(savePlaylist));
 
-      GLib.Timeout.Add(20000, new GLib.TimeoutHandler(FullScreenTest));
-
       Application.Run();
 
-    }
-
-    static bool fullscreen = false;
-    private static bool FullScreenTest() {
-      if(fullscreen) {
-        fullscreen = false;
-        mpv.Unfullscreen();
-      }
-      else {
-        fullscreen = true;
-        mpv.Fullscreen();
-      }
-      return true;
     }
  
     //called every 10 seconds to save playlist

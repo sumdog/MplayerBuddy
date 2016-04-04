@@ -100,20 +100,20 @@ namespace org.penguindreams.MplayerBuddy {
 
       Player p = (Player)m.GetValue(iter, 0);
       String stockicon = "";
-      switch(p.getState()) {
-        case Player.player_state.PLAYING:
+      switch(p.State) {
+        case Player.PlayerState.PLAYING:
           stockicon = Stock.MediaPlay;
           break;
-        case Player.player_state.STOPPED:
+        case Player.PlayerState.STOPPED:
           stockicon = Stock.MediaStop;
           break;
-        case Player.player_state.PAUSED:
+        case Player.PlayerState.PAUSED:
           stockicon = Stock.MediaPause;
           break;
-        case Player.player_state.FINISHED:
+        case Player.PlayerState.FINISHED:
           stockicon = Stock.Ok;
           break;
-        case Player.player_state.ERROR:
+        case Player.PlayerState.ERROR:
           stockicon = Stock.DialogError;
           break;
       }       
@@ -128,7 +128,7 @@ namespace org.penguindreams.MplayerBuddy {
     private void renderTime(TreeViewColumn col, CellRenderer cell, TreeModel m, TreeIter iter) {
       Player p = (Player)m.GetValue(iter, 0);
 
-      if(p.getState() == Player.player_state.FINISHED) {
+      if(p.State == Player.PlayerState.FINISHED) {
         (cell as CellRendererText).Text = "done";
       }
       else {

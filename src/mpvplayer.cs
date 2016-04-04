@@ -52,14 +52,15 @@ namespace org.penguindreams.MplayerBuddy {
 				
         mpvProcess = new Process();
         mpvProcess.StartInfo.FileName = mpvCommand;
-        //mpvProcess.StartInfo.RedirectStandardOutput = true;
-        //mpvProcess.StartInfo.RedirectStandardInput = true;
-        //mpvProcess.StartInfo.RedirectStandardError = true;
         mpvProcess.StartInfo.Arguments = string.Format(
-          "--wid {0} --input-unix-socket=\"{1}\" --idle ",
+          "--wid {0} --input-unix-socket=\"{1}\" --idle  --input-cursor=no ",
           gdk_x11_drawable_get_xid(this.GdkWindow.Handle),
           MPV_SOCKET
         );
+        /*mpvProcess.StartInfo.Arguments = string.Format(
+          " --input-unix-socket=\"{0}\" --idle ",
+          MPV_SOCKET
+        );*/
         mpvProcess.StartInfo.UseShellExecute = false;
         mpvProcess.Start();
 				
@@ -85,7 +86,25 @@ namespace org.penguindreams.MplayerBuddy {
       mpvProcess = null;
       mpvSocket = null;
 
+      this.AddEvents((int)Gdk.EventMask.ButtonPressMask);
+      this.ButtonPressEvent += AddButtonPressed;
+
       GLib.Timeout.Add(1000, new GLib.TimeoutHandler(PlaybackTimeTimer));
+    }
+
+    protected virtual void AddButtonPressed(object sender, ButtonPressEventArgs e) {
+      if(e.Event.Type == Gdk.EventType.TwoButtonPress) {
+        if(this.GdkWindow.State == Gdk.WindowState.Fullscreen) {
+          this.Unfullscreen();
+        }
+        else {
+          this.Fullscreen();
+        }
+      }
+      else if(e.Event.Type == Gdk.EventType.ButtonPress) {
+        WriteCommand("osd-level", new string[] { "2" });
+        WriteCommand("show-progress", new string[]{} );
+      }
     }
 
     public void LoadPlayer(Player play) {
@@ -93,7 +112,12 @@ namespace org.penguindreams.MplayerBuddy {
         if(!play.Equals(currentPlayer)) {
 
           if(currentPlayer != null) {
-            //Set state to stopped
+            if(currentPlayer.State == Player.PlayerState.FINISHED ||
+               currentPlayer.State == Player.PlayerState.ERROR) {
+            }
+            else {
+              currentPlayer.State = Player.PlayerState.STOPPED;
+            }
           }
 
           currentPlayer = play;
@@ -140,8 +164,18 @@ namespace org.penguindreams.MplayerBuddy {
 
         float time;
 
-        if(evnt != null && evnt.ToString().Equals("file-loaded")) {
-          WriteCommand("seek", new string[] { currentPlayer.Time.ToString(), "absolute+exact" });
+        if(evnt != null) {
+          switch(evnt.ToString()) {
+            case "file-loaded":
+              WriteCommand("seek", new string[] { currentPlayer.Time.ToString(), "absolute+exact" });
+              break;
+            case "pause":
+              currentPlayer.State = Player.PlayerState.PAUSED;
+              break;
+            case "idle":
+              currentPlayer.State = Player.PlayerState.FINISHED;
+              break;
+          }
         }
 
         if(data != null && float.TryParse(data.ToString(), out time))
