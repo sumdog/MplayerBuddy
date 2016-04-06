@@ -144,6 +144,15 @@ namespace org.penguindreams.MplayerBuddy {
       }
     }
 
+    public void Rewind() {
+      WriteCommand("seek", new string[] { "0", "absolute+exact" });  
+      currentPlayer.Time = 0;
+    }
+
+    public void UnloadPlayer() {
+      WriteCommand("stop", new string[] { }); 
+    }
+
     private void SocketReader() {
       var reader = new StreamReader(socketStream);
       while(true) {
@@ -169,6 +178,7 @@ namespace org.penguindreams.MplayerBuddy {
               break;
             case "idle":
               currentPlayer.State = Player.PlayerState.FINISHED;
+              currentPlayer = null;
               break;
           }
         }

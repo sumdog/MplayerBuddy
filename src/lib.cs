@@ -72,6 +72,9 @@ namespace org.penguindreams.MplayerBuddy {
     }
 
     public void finishPlayer() {
+      if(state == PlayerState.PLAYING) {
+        MplayerBuddy.mpv.UnloadPlayer();
+      }
       time = -1;
       state = PlayerState.FINISHED;
     }
@@ -89,8 +92,13 @@ namespace org.penguindreams.MplayerBuddy {
     }
 
     public void rewindPlayer() {
-      state = PlayerState.STOPPED;
       time = 0;
+      if(state == PlayerState.PLAYING) {
+        MplayerBuddy.mpv.Rewind();
+      }
+      else {
+        state = PlayerState.STOPPED;
+      }
     }
 
   }
