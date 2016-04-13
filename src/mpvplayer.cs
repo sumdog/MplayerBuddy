@@ -83,9 +83,16 @@ namespace org.penguindreams.MplayerBuddy {
       mpvSocket = null;
 
       this.AddEvents((int)Gdk.EventMask.ButtonPressMask);
+      this.AddEvents((int)Gdk.EventMask.ScrollMask);
       this.ButtonPressEvent += AddButtonPressed;
+      this.ScrollEvent += AddScrollEvent;
 
       GLib.Timeout.Add(1000, new GLib.TimeoutHandler(PlaybackTimeTimer));
+    }
+
+    protected virtual void AddScrollEvent(object sender, ScrollEventArgs e) {
+
+      Console.WriteLine("==============" + e.Event.Type );
     }
 
     protected virtual void AddButtonPressed(object sender, ButtonPressEventArgs e) {
@@ -98,7 +105,21 @@ namespace org.penguindreams.MplayerBuddy {
         }
       }
       else if(e.Event.Type == Gdk.EventType.ButtonPress) {
-        WriteCommand("osd-msg-bar", new string[]{"show-progress"} );
+        Console.WriteLine("Button:::::" + e.Event.Button);
+        switch(e.Event.Button) {
+          case 1:
+            break;
+          case 2:
+            break;
+          case 3:
+            break;
+          case 4:
+            break;
+          case 5:
+            break;
+        }
+
+        WriteCommand("osd-msg-bar", new string[]{ "show-progress" });
       }
     }
 
