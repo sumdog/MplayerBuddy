@@ -91,8 +91,18 @@ namespace org.penguindreams.MplayerBuddy {
     }
 
     protected virtual void AddScrollEvent(object sender, ScrollEventArgs e) {
-
-      Console.WriteLine("==============" + e.Event.Type );
+      switch(e.Event.Direction) {
+        case Gdk.ScrollDirection.Up:
+          WriteCommand("osd-msg-bar", new string[]{ "add" , "volume" , "5" });
+          break;
+        case Gdk.ScrollDirection.Down:
+          WriteCommand("osd-msg-bar", new string[]{ "add" , "volume" , "-5" });
+          break;
+        case Gdk.ScrollDirection.Left:
+          break;
+        case Gdk.ScrollDirection.Right:
+          break;
+      }
     }
 
     protected virtual void AddButtonPressed(object sender, ButtonPressEventArgs e) {
@@ -105,21 +115,18 @@ namespace org.penguindreams.MplayerBuddy {
         }
       }
       else if(e.Event.Type == Gdk.EventType.ButtonPress) {
-        Console.WriteLine("Button:::::" + e.Event.Button);
         switch(e.Event.Button) {
-          case 1:
-            break;
           case 2:
+            WriteCommand("osd-msg-bar", new string[]{ "show-progress" });
             break;
           case 3:
+            WriteCommand("osd-msg-bar", new string[]{ "cycle" , "pause" });
             break;
           case 4:
             break;
           case 5:
             break;
         }
-
-        WriteCommand("osd-msg-bar", new string[]{ "show-progress" });
       }
     }
 
