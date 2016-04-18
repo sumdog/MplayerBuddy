@@ -17,87 +17,41 @@ using System.Web;
 
 namespace org.penguindreams.MplayerBuddy {
   
-  public class Player {
+  public class Player : MPVPlayer {
+
+    public Player(String file) : base(file){}
+
+    public Player(String file, float time) : base(file,time) {}
+
+    public Player(String file, PlayerState state) : base(file,state) {}
         
-    public enum PlayerState { STOPPED, PAUSED, PLAYING, FINISHED, ERROR };
-
-    private PlayerState state;
-
-    public PlayerState State {
-      get { return state; }
-      set { state = value; }
-    }
-
-    private float time;
-    public float Time {
-      get { return time; }
-      set { time = value; }
-    }
-
-    private String file;
-
-    public Player(String file) {
-      this.file = file;
-      state = PlayerState.STOPPED;
-      time = 0;
-    }
-
-    public Player(String file, float time) {
-      this.file = file;
-      this.time = time;
-      state = PlayerState.STOPPED;
-    }
-
-    public Player(String file, PlayerState state) {
-      this.state = state;
-      this.file = file;
-      time = (state == PlayerState.FINISHED) ? -1 : 0;
-    }
-
-    /* returns full file URI */
-    public String getFile() {
-      return file;
-    }
-        
-    /* removes annoying URL encoding from filename */
-    public string getNormlaizedFile() {
-      //Normalize with UrlDecore to strip %20
-      // and Uri to strip file:///
-      return HttpUtility.UrlDecode(new Uri(file).AbsolutePath);
-    }
-        
-    /* returns just the file name */
-    public string getFileName() {
-      return System.IO.Path.GetFileName(HttpUtility.UrlDecode(file));
-    }
-
     public void finishPlayer() {
-      if(state == PlayerState.PLAYING) {
+      if(State == PlayerState.PLAYING) {
         MplayerBuddy.mpv.UnloadPlayer();
       }
-      time = -1;
-      state = PlayerState.FINISHED;
+      Time = -1;
+      State = PlayerState.FINISHED;
     }
 
     public void startPlayer() {
       //check if the file exists
       if(!File.Exists(this.getNormlaizedFile())) {
-        state = PlayerState.ERROR;
+        State = PlayerState.ERROR;
         throw new FileNotFoundException();
       }
       else if (State != PlayerState.FINISHED && State != PlayerState.ERROR){
         MplayerBuddy.mpv.LoadPlayer(this);
-        state = PlayerState.PLAYING;
+        State = PlayerState.PLAYING;
       }              
     }
 
     public void rewindPlayer() {
-      time = 0;
-      if(state == PlayerState.PLAYING) {
+      Time = 0;
+      if(State == PlayerState.PLAYING) {
         MplayerBuddy.mpv.Rewind();
       }
       else {
-        state = PlayerState.STOPPED;
+        State = PlayerState.STOPPED;
       }
     }
 

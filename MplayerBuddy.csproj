@@ -62,7 +62,6 @@
     <Compile Include="src\main.cs" />
     <Compile Include="src\preferences.cs" />
     <Compile Include="src\tree.cs" />
-    <Compile Include="src\mpvplayer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -72,4 +71,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <ProjectReference Include="mpvplayer\mpvplayer.csproj">
+      <Project>{597EAB7A-7F1A-44A0-980B-37B0EEF80F21}</Project>
+      <Name>mpvplayer</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

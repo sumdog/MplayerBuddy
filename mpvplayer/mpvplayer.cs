@@ -25,6 +25,62 @@ using Newtonsoft.Json;
 
 namespace org.penguindreams.MplayerBuddy {
 
+  public abstract class MPVPlayer {
+    public enum PlayerState { STOPPED, PAUSED, PLAYING, FINISHED, ERROR };
+
+    private PlayerState state;
+
+    public PlayerState State {
+      get { return state; }
+      set { state = value; }
+    } 
+
+    private float time;
+    public float Time {
+      get { return time; }
+      set { time = value; }
+    }
+
+    private String file;
+
+    public MPVPlayer(String file) {
+      this.file = file;
+      state = PlayerState.STOPPED;
+      time = 0;
+    }
+
+    public MPVPlayer(String file, float time) {
+      this.file = file;
+      this.time = time;
+      state = PlayerState.STOPPED;
+    }
+
+    public MPVPlayer(String file, PlayerState state) {
+      this.state = state;
+      this.file = file;
+      time = (state == PlayerState.FINISHED) ? -1 : 0;
+    }
+
+    /* removes annoying URL encoding from filename */
+    public string getNormlaizedFile() {
+      //Normalize with UrlDecore to strip %20
+      // and Uri to strip file:///
+      return HttpUtility.UrlDecode(new Uri(file).AbsolutePath);
+    }
+
+    /* returns full file URI */
+    public String getFile() {
+      return file;
+    }
+
+    /* returns just the file name */
+    public string getFileName() {
+      return System.IO.Path.GetFileName(HttpUtility.UrlDecode(file));
+    }
+
+
+  }
+
   public class MPVWindow : Window {
 		
     public const string MPV_SOCKET = "/tmp/mpvbuddy.sock";
@@ -70,7 +126,7 @@ namespace org.penguindreams.MplayerBuddy {
       }
     }
       
-    private Player currentPlayer;
+    private MPVPlayer currentPlayer;
     private String playerLock = "";
 
     private Process mpvProcess;
@@ -130,16 +186,16 @@ namespace org.penguindreams.MplayerBuddy {
       }
     }
 
-    public void LoadPlayer(Player play) {
+    public void LoadPlayer(MPVPlayer play) {
       lock(playerLock) {
         if(!play.Equals(currentPlayer)) {
 
           if(currentPlayer != null) {
-            if(currentPlayer.State == Player.PlayerState.FINISHED ||
-               currentPlayer.State == Player.PlayerState.ERROR) {
+            if(currentPlayer.State == MPVPlayer.PlayerState.FINISHED ||
+               currentPlayer.State == MPVPlayer.PlayerState.ERROR) {
             }
             else {
-              currentPlayer.State = Player.PlayerState.STOPPED;
+              currentPlayer.State = MPVPlayer.PlayerState.STOPPED;
             }
           }
 
@@ -202,10 +258,10 @@ namespace org.penguindreams.MplayerBuddy {
               WriteCommand("seek", new string[] { currentPlayer.Time.ToString(), "absolute+exact" });
               break;
             case "pause":
-              currentPlayer.State = Player.PlayerState.PAUSED;
+              currentPlayer.State = MPVPlayer.PlayerState.PAUSED;
               break;
             case "idle":
-              currentPlayer.State = Player.PlayerState.FINISHED;
+              currentPlayer.State = MPVPlayer.PlayerState.FINISHED;
               currentPlayer = null;
               break;
           }
