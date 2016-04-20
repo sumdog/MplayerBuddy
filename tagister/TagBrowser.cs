@@ -3,7 +3,8 @@ using Gtk;
 
 public class FileBrowser : Gtk.Container {
 
-  private HBox UriComponents;
+  private HBox FileUIComponents;
+
 
   public enum Listings {
     All, Tagged, Untagged
@@ -15,14 +16,29 @@ public class FileBrowser : Gtk.Container {
 
 }
 
+public class BottomNav : HBox {
+
+  private Button newTag;
+
+  public BottomNav() : base() {
+    newTag = new Button("New Tag");
+
+    Add(newTag);
+  }
+}
+
 public class TagBrowser: Gtk.Window {
   
   public TagBrowser(String[] tags) : base("Tagister.ninja") {
     
     var splitPanel = new Gtk.HPaned();
 
+    var rightPanel = new VBox();
+    rightPanel.PackStart(TagGrid(tags),true,true,0);
+    rightPanel.PackStart(new BottomNav(),false,false,0);
+
     splitPanel.Add1(new Label("File List Place Holder"));
-    splitPanel.Add2(TagGrid(tags));
+    splitPanel.Add2(rightPanel);
 
     Add(splitPanel);
   }

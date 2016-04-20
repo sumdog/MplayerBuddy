@@ -9,6 +9,8 @@ namespace tagister {
 
       String[] tags = File.ReadAllLines("tags.txt");
 
+      var db = new TagDB();
+
       TagBrowser win = new TagBrowser(tags);
       win.ShowAll();
       Application.Run();
