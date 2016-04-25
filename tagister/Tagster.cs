@@ -11,7 +11,7 @@ namespace tagister {
 
       var db = new TagDB();
 
-      TagBrowser win = new TagBrowser(tags);
+      TagBrowser win = new TagBrowser(db.Tags.ToArray());
       win.ShowAll();
       Application.Run();
     }
