@@ -6,6 +6,16 @@ using System.Linq;
 using System.Collections.Generic;
 
 namespace tagister {
+
+  public class Tag {
+    public string Name { get; set; }
+    public bool Set { get; set; }
+  }
+
+  public class FileTags {
+    public string File { get; set; }
+    public List<Tag> Tags { get; set; }
+  }
   
   public class TagDB {
 
@@ -48,8 +58,8 @@ namespace tagister {
       }
       conn = new SqliteConnection(String.Format("URI=file:{0}", dbFile));
       conn.Open();
-      RunSQL("CREATE TABLE IF NOT EXISTS tags(id INT PRIMARY KEY NOT NULL, tag TEXT)");
-      RunSQL("CREATE TABLE IF NOT EXISTS files(id INT PRIMARY KEY NOT NULL, name TEXT)");
+      RunSQL("CREATE TABLE IF NOT EXISTS tags(id INTEGER PRIMARY KEY, tag TEXT UNIQUE NOT NULL)");
+      RunSQL("CREATE TABLE IF NOT EXISTS files(id INTEGER PRIMARY KEY, name TEXT)");
       RunSQL("CREATE TABLE IF NOT EXISTS filetags(file_id INT, tag_id INT)");
     }
 
@@ -63,7 +73,43 @@ namespace tagister {
       RunSQL("INSERT INTO tags(tag) VALUES(:1)", new List<object>{tag});  
     }
 
+    public FileTags FileTags(string file) {
+      RunSQL("SELECT * FROM tags t LEFT OUTER JOIN filetags ft ON ft.tag_id=t.id LEFT OUTER JOIN files f ON f.id=ft.file_id WHERE f.name=:1 OR f.name IS NULL",
+        new List<object> { file });
+      return null;
+    }
+
   }
 
 }
+/**
+ * pastebin to implement:
+ * 
+ * 
+ * CREATE TABLE IF NOT EXISTS tags(id INTEGER PRIMARY KEY, tag TEXT NOT NULL, UNIQUE(tag));
+CREATE TABLE IF NOT EXISTS files(id INTEGER PRIMARY KEY, name TEXT NOT NULL, UNIQUE(name));
+CREATE TABLE IF NOT EXISTS filetags(file_id INT NOT NULL, tag_id INT NOT NULL, 
+      UNIQUE(file_id, tag_id), FOREIGN KEY(file_id) REFERENCES files(id), FOREIGN KEY(tag_id) REFERENCES tags(id));
+
+INSERT INTO files(name) VALUES('somefile.mp4');
+
+INSERT INTO tags(tag) VALUES('car');
+INSERT INTO tags(tag) VALUES('boat');
+
+INSERT INTO filetags VALUES(1,2);
+
+
+-- How do I get a selection of all files with all tags?
+-- (with nulls if a file has no tags)
+-- The following gets close to what I want:
+
+SELECT * FROM tags t LEFT OUTER JOIN filetags ft ON ft.tag_id=t.id;
+
+-- but if I try to join the file name, I lose the nulls:
+
+SELECT * FROM tags t LEFT OUTER JOIN filetags ft ON ft.tag_id=t.id LEFT OUTER JOIN files f ON f.id=ft.file_id WHERE f.name='somefile.mp4';
+
+
+and PRAGMA foreign_keys=1
+*/
 
