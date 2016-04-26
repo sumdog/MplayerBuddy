@@ -23,6 +23,14 @@ public class BottomNav : HBox {
   public BottomNav() : base() {
     newTag = new Button("New Tag");
 
+    newTag.Clicked += (object sender, EventArgs e) => {
+      using(var dlg = new Gtk.InputDialog()) {
+        if( ((ResponseType)dlg.Run()) == ResponseType.Ok) {
+          Console.WriteLine(dlg);
+        }
+      }
+    };
+
     Add(newTag);
   }
 }
@@ -50,7 +58,6 @@ public class TagBrowser: Gtk.Window {
     uint row = 0;
     uint col = 0;
     foreach(string tag in tags) {
-      Console.WriteLine("Tag: " + tag + "\tRow: " + row + "\tCol: " + col);
       grid.Attach(new CheckButton(tag),col % MAX_COLS, col +1 % MAX_COLS, row % MAX_ROWS, row + 1 % MAX_ROWS);
       col++;
       if(col % MAX_COLS == 0) {

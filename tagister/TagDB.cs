@@ -13,22 +13,23 @@ namespace tagister {
 
     private IDbConnection conn;
 
-    private List<Dictionary<string,string>> RunSQL(string sql) {
-      Console.WriteLine("1");
+    private List<Dictionary<string,object>> RunSQL(string sql, List<object> args = null) {
       using(var cmd = conn.CreateCommand()) {
-        Console.WriteLine("1.4");
         cmd.CommandText = sql;
+
+        if(args != null) {
+          args.ForEach(a => cmd.Parameters.Add(a));
+        }
+
         using(IDataReader rdr = cmd.ExecuteReader()) {
-          Console.WriteLine("2");
           var columns = Enumerable.Range(0, rdr.FieldCount).Select(rdr.GetName).ToList();
 
-          var retList = new List<Dictionary<string,string>>();
+          var retList = new List<Dictionary<string,object>>();
 
           while(rdr.Read()) {
-            Console.WriteLine("3");
-            var fieldMap = new Dictionary<string,string>();
+            var fieldMap = new Dictionary<string,object>();
             for(int i = 0; i < rdr.FieldCount; i++) {
-              fieldMap[columns[i]] = rdr.GetString(i);
+              fieldMap[columns[i]] = rdr.GetValue(i);
             }
             retList.Add(fieldMap);
           }
@@ -54,8 +55,12 @@ namespace tagister {
 
     public List<String> Tags {
       get {
-        return RunSQL("SELECT * FROM tags").Select( row => row["tag"] ).ToList(); 
+        return RunSQL("SELECT * FROM tags").Select( row => row["tag"].ToString() ).ToList(); 
       }
+    }
+
+    public void AddTag(string tag) {
+      RunSQL("INSERT INTO tags(tag) VALUES(:1)", new List<object>{tag});  
     }
 
   }
