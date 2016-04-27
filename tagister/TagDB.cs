@@ -21,17 +21,14 @@ namespace tagister {
 
     string Home = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
 
-    private IDbConnection conn;
+    private SqliteConnection conn;
 
     private List<Dictionary<string,object>> RunSQL(string sql, List<object> args = null) {
-      using(var cmd = conn.CreateCommand()) {
-        cmd.CommandText = sql;
+      using(var cmd = new SqliteCommand(sql, conn)) {
 
         if(args != null) {
-          //args.ForEach(a => Console.WriteLine(a));
-          //args.ForEach(a => cmd.Parameters.Add(a.ToString()));
           for(int x=0; x < args.Count(); x++) {
-            cmd.Parameters.Add(args[x]);
+            cmd.Parameters.AddWithValue(String.Format("@{0}",x), args[x]);
           }
         }
 
@@ -75,11 +72,11 @@ namespace tagister {
     }
 
     public void AddTag(string tag) {
-      RunSQL("INSERT INTO tags(tag) VALUES(:1)", new List<object>{tag});  
+      RunSQL("INSERT INTO tags(tag) VALUES(@0)", new List<object>{tag});  
     }
 
     public FileTags FileTags(string file) {
-      RunSQL("SELECT * FROM tags t LEFT OUTER JOIN filetags ft ON ft.tag_id=t.id LEFT OUTER JOIN files f ON f.id=ft.file_id WHERE f.name=:1 OR f.name IS NULL",
+      RunSQL("SELECT * FROM tags t LEFT OUTER JOIN filetags ft ON ft.tag_id=t.id LEFT OUTER JOIN files f ON f.id=ft.file_id WHERE f.name=@0 OR f.name IS NULL",
         new List<object> { file }).ForEach(a => Console.WriteLine(a));
       return null;
     }
@@ -87,34 +84,3 @@ namespace tagister {
   }
 
 }
-/**
- * pastebin to implement:
- * 
- * 
- * CREATE TABLE IF NOT EXISTS tags(id INTEGER PRIMARY KEY, tag TEXT NOT NULL, UNIQUE(tag));
-CREATE TABLE IF NOT EXISTS files(id INTEGER PRIMARY KEY, name TEXT NOT NULL, UNIQUE(name));
-CREATE TABLE IF NOT EXISTS filetags(file_id INT NOT NULL, tag_id INT NOT NULL, 
-      UNIQUE(file_id, tag_id), FOREIGN KEY(file_id) REFERENCES files(id), FOREIGN KEY(tag_id) REFERENCES tags(id));
-
-INSERT INTO files(name) VALUES('somefile.mp4');
-
-INSERT INTO tags(tag) VALUES('car');
-INSERT INTO tags(tag) VALUES('boat');
-
-INSERT INTO filetags VALUES(1,2);
-
-
--- How do I get a selection of all files with all tags?
--- (with nulls if a file has no tags)
--- The following gets close to what I want:
-
-SELECT * FROM tags t LEFT OUTER JOIN filetags ft ON ft.tag_id=t.id;
-
--- but if I try to join the file name, I lose the nulls:
-
-SELECT * FROM tags t LEFT OUTER JOIN filetags ft ON ft.tag_id=t.id LEFT OUTER JOIN files f ON f.id=ft.file_id WHERE f.name='somefile.mp4';
-
-
-and PRAGMA foreign_keys=1
-*/
-
