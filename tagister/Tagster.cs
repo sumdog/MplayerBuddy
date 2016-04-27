@@ -4,12 +4,13 @@ using Gtk;
 
 namespace tagister {
   class Tagster {
+
+    public static TagDB db;
+
     public static void Main(string[] args) {
       Application.Init();
 
-      String[] tags = File.ReadAllLines("tags.txt");
-
-      var db = new TagDB();
+      db = new TagDB();
 
       TagBrowser win = new TagBrowser(db.Tags.ToArray());
       win.ShowAll();

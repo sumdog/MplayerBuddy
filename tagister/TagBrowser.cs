@@ -16,6 +16,23 @@ public class FileBrowser : Gtk.Container {
 
 }
 
+public class UserInputDialog : Gtk.Dialog {
+
+  public Entry UserInput;
+
+  public UserInputDialog() : base() {
+    Title = "New Tag";
+    UserInput = new Entry();
+    VBox.Add(UserInput);
+    AddButton(Stock.Cancel, ResponseType.Cancel);
+    AddButton(Stock.Ok, ResponseType.Ok); 
+    ShowAll();
+    /*this.Response += (object obj, ResponseArgs a) => {
+      Respond(a.ResponseId);
+    };*/
+  }
+}
+
 public class BottomNav : HBox {
 
   private Button newTag;
@@ -24,10 +41,22 @@ public class BottomNav : HBox {
     newTag = new Button("New Tag");
 
     newTag.Clicked += (object sender, EventArgs e) => {
-      using(var dlg = new Gtk.InputDialog()) {
-        if( ((ResponseType)dlg.Run()) == ResponseType.Ok) {
-          Console.WriteLine(dlg);
+      using(var dialog = new UserInputDialog()) {
+        switch((ResponseType) dialog.Run()) {
+          case ResponseType.Ok:
+            if(dialog.UserInput.Text.Trim() == "") {
+              var m = new MessageDialog(new Gtk.Window("Invalid Tag"),DialogFlags.Modal,MessageType.Error,ButtonsType.Ok,"Invalid Tag");
+              m.Run();
+              m.Destroy();
+            }
+            else {
+              tagister.Tagster.db.AddTag(dialog.UserInput.Text.Trim());   
+            }
+            break;
+          default:
+            break;
         }
+        dialog.Destroy();
       }
     };
 
