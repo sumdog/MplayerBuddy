@@ -2,18 +2,20 @@
 using System.IO;
 using Gtk;
 
-namespace tagister {
+namespace tagster {
   class Tagster {
 
-    public static TagDB db;
+    private readonly static TagDB db = new TagDB();
+
+    private readonly static TagBrowser gui = new TagBrowser();
 
     public static void Main(string[] args) {
       Application.Init();
 
-      db = new TagDB();
+      //Dependency Injection
+      gui.Database = db;
 
-      TagBrowser win = new TagBrowser(db.Tags.ToArray());
-      win.ShowAll();
+      gui.ShowAll();
       Application.Run();
     }
   }

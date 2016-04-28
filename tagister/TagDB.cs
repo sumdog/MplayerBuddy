@@ -5,17 +5,7 @@ using Mono.Data.Sqlite;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace tagister {
-
-  public class Tag {
-    public string Name { get; set; }
-    public bool Set { get; set; }
-  }
-
-  public class FileTags {
-    public string File { get; set; }
-    public List<Tag> Tags { get; set; }
-  }
+namespace tagster {
   
   public class TagDB {
 
@@ -79,6 +69,10 @@ namespace tagister {
       RunSQL("SELECT * FROM tags t LEFT OUTER JOIN filetags ft ON ft.tag_id=t.id LEFT OUTER JOIN files f ON f.id=ft.file_id WHERE f.name=@0 OR f.name IS NULL",
         new List<object> { file }).ForEach(a => Console.WriteLine(a));
       return null;
+    }
+
+    public List<TFile> ListFiles() {
+      return RunSQL("SELECT * FROM files").Select( row => new TFile { Id = long.Parse(row["Id"].ToString()), File = row["File"].ToString() } ).ToList();
     }
 
   }
