@@ -1,5 +1,7 @@
 ﻿using System;
 using Gtk;
+using System.Collections.Generic;
+
 namespace tagster {
   
   public class FileBrowser : Gtk.Container {
@@ -65,12 +67,34 @@ namespace tagster {
     }
   }
 
-  public class TagGrid : Container {
+  public class TagGrid : ScrolledWindow {
 
-    public List<Tag>
+    public List<Tag> Tags {
+      set {
+      }
+    }
+
+    public uint Rows { get; set; } 
+
+    public uint Cols { get; set; }
 
     public TagGrid() : base() {
       
+    }
+
+    private void refreshWindow() {
+      var grid = new Gtk.Table(Rows, Cols, true);
+      uint row = 0;
+      uint col = 0;
+      foreach(string tag in tags) {
+        grid.Attach(new CheckButton(tag),col % Cols, col +1 % Cols, row % Rows, row + 1 % Rows);
+        col++;
+        if(col % Cols == 0) {
+          col = 0;
+          row++;
+        }
+      }
+      AddWithViewport(grid);
     }
 
 
@@ -93,25 +117,7 @@ namespace tagster {
 
       Add(splitPanel);
     }
-
-    private Container TagGrid(string[] tags) {
-      const uint MAX_ROWS = 12;
-      const uint MAX_COLS = 6;
-      var grid = new Gtk.Table(MAX_ROWS, MAX_COLS, true);
-      uint row = 0;
-      uint col = 0;
-      foreach(string tag in tags) {
-        grid.Attach(new CheckButton(tag),col % MAX_COLS, col +1 % MAX_COLS, row % MAX_ROWS, row + 1 % MAX_ROWS);
-        col++;
-        if(col % MAX_COLS == 0) {
-          col = 0;
-          row++;
-        }
-      }
-      var scroller = new ScrolledWindow();
-      scroller.AddWithViewport(grid);
-      return scroller;
-    }
+      
 
     protected void OnDeleteEvent(object sender, DeleteEventArgs a) {
       Application.Quit();
