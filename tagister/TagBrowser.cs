@@ -69,8 +69,12 @@ namespace tagster {
 
   public class TagGrid : ScrolledWindow {
 
+    private List<Tag> tags;
+
     public List<Tag> Tags {
       set {
+        tags = value;
+        refreshWindow();
       }
     }
 
@@ -79,15 +83,21 @@ namespace tagster {
     public uint Cols { get; set; }
 
     public TagGrid() : base() {
-      
+      Rows = 12;
+      Cols = 5;
     }
 
     private void refreshWindow() {
       var grid = new Gtk.Table(Rows, Cols, true);
       uint row = 0;
       uint col = 0;
-      foreach(string tag in tags) {
-        grid.Attach(new CheckButton(tag),col % Cols, col +1 % Cols, row % Rows, row + 1 % Rows);
+      foreach(Tag tag in tags) { 
+        
+        var button = new CheckButton(tag.Name);
+        button.Active = tag.Set;
+        button.Click += TagBoxClick;
+
+        grid.Attach(button, col % Cols, col +1 % Cols, row % Rows, row + 1 % Rows);
         col++;
         if(col % Cols == 0) {
           col = 0;
@@ -95,6 +105,9 @@ namespace tagster {
         }
       }
       AddWithViewport(grid);
+    }
+
+    public void TagBoxClick() {
     }
 
 
@@ -109,7 +122,10 @@ namespace tagster {
       var splitPanel = new Gtk.HPaned();
 
       var rightPanel = new VBox();
-      rightPanel.PackStart(TagGrid(),true,true,0);
+
+      var tagGrid = new TagGrid();
+
+      rightPanel.PackStart(tagGrid, true,true,0);
       rightPanel.PackStart(new BottomNav(),false,false,0);
 
       splitPanel.Add1(new Label("File List Place Holder"));

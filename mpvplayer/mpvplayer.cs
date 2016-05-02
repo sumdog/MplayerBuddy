@@ -161,8 +161,11 @@ namespace org.penguindreams.MplayerBuddy {
       }
     }
 
+    public event EventHandler BackMouseButton;
+    public event EventHandler FrontMouseButton;
+
     protected virtual void AddButtonPressed(object sender, ButtonPressEventArgs e) {
-      if(e.Event.Type == Gdk.EventType.TwoButtonPress) {
+      if(e.Event.Type == Gdk.EventType.TwoButtonPress && e.Event.Button == 1) {
         if(this.GdkWindow.State == Gdk.WindowState.Fullscreen) {
           this.Unfullscreen();
         }
@@ -179,8 +182,14 @@ namespace org.penguindreams.MplayerBuddy {
             WriteCommand("osd-msg-bar", new string[]{ "cycle" , "pause" });
             break;
           case 4:
+            if(BackMouseButton != null) {
+              BackMouseButton(this, e);  
+            }
             break;
           case 5:
+            if(FrontMouseButton != null) {
+              FrontMouseButton(this, e);
+            }
             break;
         }
       }
