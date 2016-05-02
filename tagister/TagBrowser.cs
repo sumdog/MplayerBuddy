@@ -40,6 +40,8 @@ namespace tagster {
 
     private Button newTag;
 
+    public event EventHandler<Tag> NewTag;
+
     public BottomNav() : base() {
       newTag = new Button("New Tag");
 
@@ -53,7 +55,9 @@ namespace tagster {
                 m.Destroy();
               }
               else {
-                tagister.Tagster.db.AddTag(dialog.UserInput.Text.Trim());   
+                if(NewTag != null) {
+                  NewTag(this, new Tag { Name = dialog.UserInput.Text.Trim(), Set = false });   
+                }
               }
               break;
             default:
@@ -95,7 +99,7 @@ namespace tagster {
         
         var button = new CheckButton(tag.Name);
         button.Active = tag.Set;
-        button.Click += TagBoxClick;
+        button.Clicked += TagBoxClick;
 
         grid.Attach(button, col % Cols, col +1 % Cols, row % Rows, row + 1 % Rows);
         col++;
@@ -107,7 +111,7 @@ namespace tagster {
       AddWithViewport(grid);
     }
 
-    public void TagBoxClick() {
+    public void TagBoxClick(object sender, EventArgs e) {
     }
 
 
@@ -125,8 +129,13 @@ namespace tagster {
 
       var tagGrid = new TagGrid();
 
+      var bottomNav = new BottomNav();
+      bottomNav.NewTag += (object sender, Tag e) => {
+        Database.AddTag(e.Name);
+      };
+
       rightPanel.PackStart(tagGrid, true,true,0);
-      rightPanel.PackStart(new BottomNav(),false,false,0);
+      rightPanel.PackStart(bottomNav,false,false,0);
 
       splitPanel.Add1(new Label("File List Place Holder"));
       splitPanel.Add2(rightPanel);
