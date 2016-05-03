@@ -82,17 +82,29 @@ namespace tagster {
       }
     }
 
-    public uint Rows { get; set; } 
+    public uint Rows { 
+      get { return grid.NRows; } 
+      set { grid.NRows = value; } 
+    } 
 
-    public uint Cols { get; set; }
+    public uint Cols { 
+      get { return grid.NColumns; } 
+      set { grid.NColumns = value; } 
+    }
 
     public TagGrid() : base() {
+      grid = new Gtk.Table(0,0,true);
       Rows = 12;
       Cols = 5;
     }
 
+    private Gtk.Table grid;
+
     private void refreshWindow() {
-      var grid = new Gtk.Table(Rows, Cols, true);
+      foreach(Widget r in grid.Children) {
+        Remove(r);
+        r.Destroy();
+      }
       uint row = 0;
       uint col = 0;
       foreach(Tag tag in tags) { 
@@ -108,10 +120,13 @@ namespace tagster {
           row++;
         }
       }
+
       AddWithViewport(grid);
+      ShowAll();
     }
 
     public void TagBoxClick(object sender, EventArgs e) {
+      Console.WriteLine(sender.ToString());
     }
 
 
@@ -119,7 +134,19 @@ namespace tagster {
 
   public class TagBrowser: Gtk.Window {
 
-    public TagDB Database { get; set; }
+    private TagDB database;
+
+    public TagDB Database { 
+      get {
+        return database;
+      } 
+      set {
+        database = value;
+        tagGrid.Tags = value.Tags;
+      }
+    }
+
+    private TagGrid tagGrid;
 
     public TagBrowser() : base("Tagister.ninja") {
       
@@ -127,11 +154,12 @@ namespace tagster {
 
       var rightPanel = new VBox();
 
-      var tagGrid = new TagGrid();
+      tagGrid = new TagGrid();
 
       var bottomNav = new BottomNav();
       bottomNav.NewTag += (object sender, Tag e) => {
         Database.AddTag(e.Name);
+        tagGrid.Tags = Database.Tags;
       };
 
       rightPanel.PackStart(tagGrid, true,true,0);
