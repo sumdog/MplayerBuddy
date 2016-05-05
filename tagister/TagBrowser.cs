@@ -4,9 +4,13 @@ using System.Collections.Generic;
 
 namespace tagster {
   
-  public class FileBrowser : Gtk.Container {
+  public class FileBrowser : Container {
 
-    private HBox FileUIComponents;
+    private HBox fileUIComponents;
+
+    private ComboBox cbFileListing;
+
+    private TreeView tvFiles; 
 
 
     public enum Listings {
@@ -19,7 +23,7 @@ namespace tagster {
 
   }
 
-  public class UserInputDialog : Gtk.Dialog {
+  public class UserInputDialog : Dialog {
 
     public Entry UserInput;
 
