@@ -1,6 +1,47 @@
 ﻿using System.Collections.Generic;
+using Gtk;
 
 namespace tagster {
+
+  public class FileTaggerView : TreeView {
+
+    public FileTaggerView() {
+
+      AppendColumn(CreateColumn("File"));
+      
+    }
+
+    private TreeViewColumn CreateColumn(string title) {
+      var c = new TreeViewColumn() { Title = title };
+      CellRenderer cr = new CellRendererText();
+      c.PackStart(cr, true);
+      c.SetCellDataFunc(cr, new TreeCellDataFunc( 
+        (TreeViewColumn col, CellRenderer cell, TreeModel m, TreeIter iter) => {
+          (cell as CellRendererText).Text = ((TFile)m.GetValue(iter, 0)).File;
+        }));
+      return(c);
+    }
+   
+  }
+
+  public class FileTaggerList : ListStore {
+  
+    private List<TFile> fileList;
+
+    public List<TFile> FileList {
+      get {
+        return fileList;
+      }
+      set {
+        this.Clear();
+        foreach(TFile f in value) {
+          AppendValues(f);
+        }
+        fileList = value;
+      }
+    }
+  
+  }
 
   public class Tag {
     public string Name { get; set; }
