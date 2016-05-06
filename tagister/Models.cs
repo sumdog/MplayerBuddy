@@ -1,14 +1,20 @@
 ﻿using System.Collections.Generic;
 using Gtk;
+using System;
 
 namespace tagster {
 
   public class FileTaggerView : TreeView {
 
-    public FileTaggerView() {
-
+    //TODO: nullable type?
+    public FileTaggerView(FileTaggerList model = null) {
       AppendColumn(CreateColumn("File"));
-      
+      if(model == null) {
+        Model = model;
+      }
+      else {
+        Model = new FileTaggerList();
+      }
     }
 
     private TreeViewColumn CreateColumn(string title) {
@@ -17,15 +23,26 @@ namespace tagster {
       c.PackStart(cr, true);
       c.SetCellDataFunc(cr, new TreeCellDataFunc( 
         (TreeViewColumn col, CellRenderer cell, TreeModel m, TreeIter iter) => {
-          (cell as CellRendererText).Text = ((TFile)m.GetValue(iter, 0)).File;
+          //This is terrible. TODO: Fix this
+          var t = ((FileTaggerList)m).FileList[int.Parse(m.GetStringFromIter(iter))].File;        
+          (cell as CellRendererText).Text = t; 
         }));
       return(c);
     }
-   
   }
 
   public class FileTaggerList : ListStore {
   
+    //TODO: nullable type?
+    public FileTaggerList(List<TFile> fileList = null) {
+      if(fileList != null) {
+        FileList = fileList;
+      }
+      else {
+        FileList = new List<TFile>();
+      }
+    }
+
     private List<TFile> fileList;
 
     public List<TFile> FileList {

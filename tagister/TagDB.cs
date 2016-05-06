@@ -72,7 +72,7 @@ namespace tagster {
     }
 
     public List<TFile> ListFiles() {
-      return RunSQL("SELECT * FROM files").Select( row => new TFile { Id = long.Parse(row["Id"].ToString()), File = row["File"].ToString() } ).ToList();
+      return RunSQL("SELECT * FROM files").Select( row => new TFile { Id = long.Parse(row["id"].ToString()), File = row["name"].ToString() } ).ToList();
     }
 
   }

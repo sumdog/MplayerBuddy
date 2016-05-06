@@ -140,6 +140,8 @@ namespace tagster {
 
     private TagDB database;
 
+    private FileTaggerView tree;
+
     public TagDB Database { 
       get {
         return database;
@@ -147,6 +149,7 @@ namespace tagster {
       set {
         database = value;
         tagGrid.Tags = value.Tags;
+        tree.Model = new FileTaggerList( value.ListFiles() );
       }
     }
 
@@ -157,8 +160,12 @@ namespace tagster {
       var splitPanel = new Gtk.HPaned();
 
       var rightPanel = new VBox();
+      var leftPanel = new HBox();
 
       tagGrid = new TagGrid();
+      tree = new FileTaggerView();
+
+      leftPanel.PackStart(tree, true, true, 0);
 
       var bottomNav = new BottomNav();
       bottomNav.NewTag += (object sender, Tag e) => {
@@ -169,7 +176,7 @@ namespace tagster {
       rightPanel.PackStart(tagGrid, true,true,0);
       rightPanel.PackStart(bottomNav,false,false,0);
 
-      splitPanel.Add1(new Label("File List Place Holder"));
+      splitPanel.Add1(leftPanel);
       splitPanel.Add2(rightPanel);
 
       Add(splitPanel);
