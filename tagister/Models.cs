@@ -7,14 +7,8 @@ namespace tagster {
   public class FileTaggerView : TreeView {
 
     //TODO: nullable type?
-    public FileTaggerView(FileTaggerList model = null) {
+    public FileTaggerView() {
       AppendColumn(CreateColumn("File"));
-      if(model == null) {
-        Model = model;
-      }
-      else {
-        Model = new FileTaggerList();
-      }
     }
 
     private TreeViewColumn CreateColumn(string title) {
@@ -23,9 +17,7 @@ namespace tagster {
       c.PackStart(cr, true);
       c.SetCellDataFunc(cr, new TreeCellDataFunc( 
         (TreeViewColumn col, CellRenderer cell, TreeModel m, TreeIter iter) => {
-          //This is terrible. TODO: Fix this
-          var t = ((FileTaggerList)m).FileList[int.Parse(m.GetStringFromIter(iter))].File;        
-          (cell as CellRendererText).Text = t; 
+          (cell as CellRendererText).Text = ((TFile)m.GetValue(iter, 0)).File;
         }));
       return(c);
     }
@@ -34,7 +26,7 @@ namespace tagster {
   public class FileTaggerList : ListStore {
   
     //TODO: nullable type?
-    public FileTaggerList(List<TFile> fileList = null) {
+    public FileTaggerList(List<TFile> fileList = null) : base(typeof(TFile)) {
       if(fileList != null) {
         FileList = fileList;
       }
