@@ -23,8 +23,7 @@ namespace tagster {
   }
 
   public class FileTaggerList : ListStore {
-  
-    //TODO: nullable type?
+
     public FileTaggerList(List<TFile> fileList = null) : base(typeof(TFile)) {
       if(fileList != null) {
         FileList = fileList;
@@ -54,6 +53,16 @@ namespace tagster {
   public class Tag {
     public string Name { get; set; }
     public bool Set { get; set; }
+    public long Id { get; set; }
+  }
+
+  public class TagCheckButton : CheckButton {
+  
+    public Tag Tag { get; set; }
+
+    public TagCheckButton(Tag tag) : base(tag.Name) {
+      Tag = tag;
+    }
   }
 
   public class FileTags {

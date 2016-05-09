@@ -57,7 +57,7 @@ namespace tagster {
 
     public List<Tag> Tags {
       get {
-        return RunSQL("SELECT * FROM tags").Select( row => new Tag() { Name = row["tag"].ToString(), Set = false } ).ToList(); 
+        return RunSQL("SELECT * FROM tags").Select( row => new Tag() { Id = Convert.ToInt64(row["id"]), Name = row["tag"].ToString(), Set = false } ).ToList(); 
       }
     }
 
@@ -65,18 +65,21 @@ namespace tagster {
       RunSQL("INSERT INTO tags(tag) VALUES(@0)", new List<object>{tag});  
     }
 
-    //public FileTags FileTags(int id) {
-    //}
+    public void UpdateTag(TFile file, Tag tag) {
+      RunSQL((tag.Set) ? 
+        "INSERT INTO filetags(file_id, tag_id) VALUES(@0, @1)" : 
+        "DELETE FROM filetags WHERE file_id=@0 AND tag_id=@1", new List<object> {file.Id, tag.Id} );
+    }
 
-    public List<Tag> TagsForFile(string file) {
-      return RunSQL("SELECT f.*, t.*, (ft.file_id IS NOT NULL) AS file_has_tag FROM files f CROSS JOIN tags t LEFT JOIN filetags ft ON ft.file_id=f.id AND ft.tag_id=t.id",
-        new List<object> { file }).Select( a => 
-          new Tag() { Name = a["tag"].ToString(), Set = (a["file_has_tag"].ToString() == "1") } 
+    public List<Tag> TagsForFile(TFile file) {
+      return RunSQL("SELECT f.id AS file_id, f.name AS name, t.tag AS tag, t.id AS tag_id, (ft.file_id IS NOT NULL) AS file_has_tag FROM files f CROSS JOIN tags t LEFT JOIN filetags ft ON ft.file_id=f.id AND ft.tag_id=t.id WHERE f.id=@0 ORDER BY t.tag",
+        new List<object> { file.Id }).Select( a => 
+          new Tag() { Name = a["tag"].ToString(), Set = (a["file_has_tag"].ToString() == "1"), Id = Convert.ToInt64(a["tag_id"]) } 
         ).ToList();
     }
 
     public List<TFile> ListFiles() {
-      return RunSQL("SELECT * FROM files").Select( row => new TFile { Id = long.Parse(row["id"].ToString()), File = row["name"].ToString() } ).ToList();
+      return RunSQL("SELECT * FROM files").Select( row => new TFile { Id = Convert.ToInt64(row["id"]), File = row["name"].ToString() } ).ToList();
     }
 
   }

@@ -104,6 +104,8 @@ namespace tagster {
 
     private Gtk.Table grid;
 
+    public event EventHandler<Tag> TagChange;
+
     private void refreshWindow() {
       foreach(Widget r in grid.Children) {
         Remove(r);
@@ -113,7 +115,7 @@ namespace tagster {
       uint col = 0;
       foreach(Tag tag in tags) { 
         
-        var button = new CheckButton(tag.Name);
+        var button = new TagCheckButton(tag);
         button.Active = tag.Set;
         button.Clicked += TagBoxClick;
 
@@ -130,7 +132,11 @@ namespace tagster {
     }
 
     public void TagBoxClick(object sender, EventArgs e) {
-      Console.WriteLine(sender.ToString());
+      if(TagChange != null) {
+        var t = ((TagCheckButton)sender);
+        t.Tag.Set = t.Active;
+        TagChange(this, t.Tag);
+      }
     }
 
 
@@ -166,12 +172,19 @@ namespace tagster {
       tree = new FileTaggerView();
 
       leftPanel.PackStart(tree, true, true, 0);
-      tree.Selection.Changed += (object o, EventArgs args) => { 
-        TreeIter selected;
-        if(tree.Selection.GetSelected(out selected)) {
-          var s = ((TFile)tree.Model.GetValue(selected, 0));
-          tagGrid.Tags = database.TagsForFile(s.File);
-        }
+
+      #region events
+
+      tree.Selection.Changed += (object o, EventArgs args) => {
+        var s = SelectedFile();
+        if(s != null)
+          tagGrid.Tags = database.TagsForFile(s);
+      };
+        
+      tagGrid.TagChange += (object sender, Tag e) => {
+        var s = SelectedFile();
+        if(s != null)
+          database.UpdateTag(s, e);
       };
 
       var bottomNav = new BottomNav();
@@ -180,6 +193,8 @@ namespace tagster {
         tagGrid.Tags = Database.Tags;
       };
 
+      #endregion
+
       rightPanel.PackStart(tagGrid, true,true,0);
       rightPanel.PackStart(bottomNav,false,false,0);
 
@@ -187,6 +202,14 @@ namespace tagster {
       splitPanel.Add2(rightPanel);
 
       Add(splitPanel);
+    }
+
+    private TFile SelectedFile() {
+      TreeIter selected;
+      if(tree.Selection.GetSelected(out selected)) {
+        return (TFile) tree.Model.GetValue(selected, 0);
+      }   
+      return null;
     }
       
 
