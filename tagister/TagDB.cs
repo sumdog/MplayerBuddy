@@ -65,10 +65,14 @@ namespace tagster {
       RunSQL("INSERT INTO tags(tag) VALUES(@0)", new List<object>{tag});  
     }
 
-    public FileTags FileTags(string file) {
-      RunSQL("SELECT * FROM tags t LEFT OUTER JOIN filetags ft ON ft.tag_id=t.id LEFT OUTER JOIN files f ON f.id=ft.file_id WHERE f.name=@0 OR f.name IS NULL",
-        new List<object> { file }).ForEach(a => Console.WriteLine(a));
-      return null;
+    //public FileTags FileTags(int id) {
+    //}
+
+    public List<Tag> TagsForFile(string file) {
+      return RunSQL("SELECT f.*, t.*, (ft.file_id IS NOT NULL) AS file_has_tag FROM files f CROSS JOIN tags t LEFT JOIN filetags ft ON ft.file_id=f.id AND ft.tag_id=t.id",
+        new List<object> { file }).Select( a => 
+          new Tag() { Name = a["tag"].ToString(), Set = (a["file_has_tag"].ToString() == "1") } 
+        ).ToList();
     }
 
     public List<TFile> ListFiles() {

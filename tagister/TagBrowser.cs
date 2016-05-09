@@ -166,6 +166,13 @@ namespace tagster {
       tree = new FileTaggerView();
 
       leftPanel.PackStart(tree, true, true, 0);
+      tree.Selection.Changed += (object o, EventArgs args) => { 
+        TreeIter selected;
+        if(tree.Selection.GetSelected(out selected)) {
+          var s = ((TFile)tree.Model.GetValue(selected, 0));
+          tagGrid.Tags = database.TagsForFile(s.File);
+        }
+      };
 
       var bottomNav = new BottomNav();
       bottomNav.NewTag += (object sender, Tag e) => {

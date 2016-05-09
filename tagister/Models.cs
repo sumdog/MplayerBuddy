@@ -6,7 +6,6 @@ namespace tagster {
 
   public class FileTaggerView : TreeView {
 
-    //TODO: nullable type?
     public FileTaggerView() {
       AppendColumn(CreateColumn("File"));
     }
