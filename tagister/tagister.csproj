@@ -68,4 +68,10 @@
     <Compile Include="Events.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\mpvplayer\mpvplayer.csproj">
+      <Project>{597EAB7A-7F1A-44A0-980B-37B0EEF80F21}</Project>
+      <Name>mpvplayer</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

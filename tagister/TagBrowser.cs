@@ -1,6 +1,7 @@
 ﻿using System;
 using Gtk;
 using System.Collections.Generic;
+using org.penguindreams.MplayerBuddy;
 
 namespace tagster {
   
@@ -148,6 +149,8 @@ namespace tagster {
 
     private FileTaggerView tree;
 
+    public MPVWindow MPV { get; set; }
+
     public TagDB Database { 
       get {
         return database;
@@ -179,6 +182,8 @@ namespace tagster {
         var s = SelectedFile();
         if(s != null)
           tagGrid.Tags = database.TagsForFile(s);
+        if(MPV != null) 
+          MPV.LoadPlayer(new MPVPlayer(s.File));
       };
         
       tagGrid.TagChange += (object sender, Tag e) => {
