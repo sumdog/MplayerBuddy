@@ -183,7 +183,7 @@ namespace tagster {
         if(s != null)
           tagGrid.Tags = database.TagsForFile(s);
         if(MPV != null) 
-          MPV.LoadPlayer(new MPVPlayer(s.File));
+          MPV.LoadPlayer(new Viewer(System.IO.Path.Combine("/home/skhanna/workspace/MPlayerBuddy", s.File)));
       };
         
       tagGrid.TagChange += (object sender, Tag e) => {

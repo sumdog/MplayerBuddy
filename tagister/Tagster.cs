@@ -17,6 +17,8 @@ namespace tagster {
 
       //Dependency Injection
       gui.Database = db;
+      mpv.ShowAll();
+      mpv.MpvCommand = "/usr/bin/mpv";
       gui.MPV = mpv;
 
       gui.ShowAll();

@@ -83,7 +83,7 @@ namespace org.penguindreams.MplayerBuddy {
 
   public class MPVWindow : Window {
 		
-    public const string MPV_SOCKET = "/tmp/mpvbuddy.sock";
+    public readonly string MPV_SOCKET = String.Format("/tmp/mpvplayer-{0}.sock", Guid.NewGuid().ToString());
 		
     private string mpvCommand;
 
@@ -109,7 +109,7 @@ namespace org.penguindreams.MplayerBuddy {
         mpvProcess = new Process();
         mpvProcess.StartInfo.FileName = mpvCommand;
         mpvProcess.StartInfo.Arguments = string.Format(
-          "--wid {0} --input-unix-socket=\"{1}\" --idle  --input-cursor=no ",
+          "--wid {0} --input-ipc-server=\"{1}\" --idle  --input-cursor=no ",
           gdk_x11_drawable_get_xid(this.GdkWindow.Handle),
           MPV_SOCKET
         );

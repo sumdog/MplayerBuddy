@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Gtk;
 using System;
+using org.penguindreams.MplayerBuddy;
 
 namespace tagster {
 
@@ -62,6 +63,12 @@ namespace tagster {
 
     public TagCheckButton(Tag tag) : base(tag.Name) {
       Tag = tag;
+    }
+  }
+
+  public class Viewer : MPVPlayer {
+    public Viewer(String file) : base(new Uri(file).AbsoluteUri) {
+      Console.WriteLine(file);
     }
   }
 
