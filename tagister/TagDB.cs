@@ -72,11 +72,15 @@ namespace tagster {
     }
 
     public List<Tag> TagsForFile(TFile file) {
-      return RunSQL("SELECT f.id AS file_id, f.name AS name, t.tag AS tag, t.id AS tag_id, (ft.file_id IS NOT NULL) AS file_has_tag FROM files f CROSS JOIN tags t LEFT JOIN filetags ft ON ft.file_id=f.id AND ft.tag_id=t.id WHERE f.id=@0 ORDER BY t.tag",
+      return RunSQL(@"SELECT f.id AS file_id, f.name AS name, t.tag AS tag, t.id AS tag_id, (ft.file_id IS NOT NULL) AS file_has_tag 
+                      FROM files f CROSS JOIN tags t LEFT JOIN filetags ft ON ft.file_id=f.id AND ft.tag_id=t.id 
+                      WHERE f.id=@0 ORDER BY t.tag",
         new List<object> { file.Id }).Select( a => 
           new Tag() { Name = a["tag"].ToString(), Set = (a["file_has_tag"].ToString() == "1"), Id = Convert.ToInt64(a["tag_id"]) } 
         ).ToList();
     }
+
+    const string NUM_TAGS_SQL = "SELECT f.id AS file_id, f.name AS name, SUM(ft.file_id IS NOT NULL) AS file_has_tag FROM files f ";
 
     public List<TFile> ListFiles() {
       return RunSQL("SELECT * FROM files").Select( row => new TFile { Id = Convert.ToInt64(row["id"]), File = row["name"].ToString() } ).ToList();
