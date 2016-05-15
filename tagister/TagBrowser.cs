@@ -183,7 +183,7 @@ namespace tagster {
         if(s != null)
           tagGrid.Tags = database.TagsForFile(s);
         if(MPV != null) 
-          MPV.LoadPlayer(new Viewer(System.IO.Path.Combine("/home/skhanna/workspace/MPlayerBuddy", s.File)));
+          MPV.LoadPlayer(new Viewer(System.IO.Path.Combine("/media/holly/webop/movies-watched", s.File)));
       };
         
       tagGrid.TagChange += (object sender, Tag e) => {
@@ -195,7 +195,11 @@ namespace tagster {
       var bottomNav = new BottomNav();
       bottomNav.NewTag += (object sender, Tag e) => {
         Database.AddTag(e.Name);
-        tagGrid.Tags = Database.Tags;
+        var s = SelectedFile();
+        if(s != null)
+          tagGrid.Tags = database.TagsForFile(s);
+        else
+          tagGrid.Tags = Database.Tags;
       };
 
       #endregion

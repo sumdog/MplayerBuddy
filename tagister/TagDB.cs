@@ -61,6 +61,10 @@ namespace tagster {
       }
     }
 
+    public void AddFile(string file) {
+      RunSQL("INSERT INTO files(name) VALUES(@0)", new List<object> { new FileInfo(file).Name });
+    }
+
     public void AddTag(string tag) {
       RunSQL("INSERT INTO tags(tag) VALUES(@0)", new List<object>{tag});  
     }
@@ -80,7 +84,14 @@ namespace tagster {
         ).ToList();
     }
 
-    const string NUM_TAGS_SQL = "SELECT f.id AS file_id, f.name AS name, SUM(ft.file_id IS NOT NULL) AS file_has_tag FROM files f ";
+    public List<TFile> ListFiles(bool tagged) {
+      return RunSQL(@"SELECT f.id AS file_id, f.name AS name, SUM(ft.tag_id) is not null AS file_has_tags 
+                                  FROM files f LEFT JOIN filetags ft ON ft.file_id=f.id
+                                  GROUP BY file_id HAVING file_has_tags=@0",
+        new List<object> { (tagged) ? 1 : 0 }).Select( row => 
+          new TFile() { Id = Int64.Parse(row["file_id"].ToString()), File = row["name"].ToString() }
+        ).ToList();
+    }
 
     public List<TFile> ListFiles() {
       return RunSQL("SELECT * FROM files").Select( row => new TFile { Id = Convert.ToInt64(row["id"]), File = row["name"].ToString() } ).ToList();
