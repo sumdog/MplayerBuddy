@@ -35,9 +35,6 @@ namespace tagster {
       AddButton(Stock.Cancel, ResponseType.Cancel);
       AddButton(Stock.Ok, ResponseType.Ok); 
       ShowAll();
-      /*this.Response += (object obj, ResponseArgs a) => {
-        Respond(a.ResponseId);
-      };*/
     }
   }
 
@@ -151,6 +148,10 @@ namespace tagster {
 
     public MPVWindow MPV { get; set; }
 
+    public enum TagListing { All, Tagged, Untagged, Custom };
+
+    private TagListing currentListing;
+
     public TagDB Database { 
       get {
         return database;
@@ -169,12 +170,18 @@ namespace tagster {
       var splitPanel = new Gtk.HPaned();
 
       var rightPanel = new VBox();
-      var leftPanel = new HBox();
+      var leftPanel = new VBox();
+
+      currentListing = TagListing.All;
+      var cbListing = new ComboBox(new string[] { "All", "Tagged", "Untagged" });
 
       tagGrid = new TagGrid();
       tree = new FileTaggerView();
 
-      leftPanel.PackStart(tree, true, true, 0);
+      leftPanel.PackStart(cbListing, false, true, 0);
+      var sw = new ScrolledWindow();
+      sw.Add(tree);
+      leftPanel.PackStart(sw, true, true, 0);
 
       #region events
 
@@ -209,6 +216,7 @@ namespace tagster {
 
       splitPanel.Add1(leftPanel);
       splitPanel.Add2(rightPanel);
+      splitPanel.Position = 300;
 
       Add(splitPanel);
     }
