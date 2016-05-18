@@ -5,24 +5,6 @@ using org.penguindreams.MplayerBuddy;
 
 namespace tagster {
   
-  public class FileBrowser : Container {
-
-    private HBox fileUIComponents;
-
-    private ComboBox cbFileListing;
-
-    private TreeView tvFiles; 
-
-
-    public enum Listings {
-      All, Tagged, Untagged
-    }
-
-    public FileBrowser(string directory) : base() {
-      
-    }
-
-  }
 
   public class UserInputDialog : Dialog {
 
@@ -140,7 +122,7 @@ namespace tagster {
 
   }
 
-  public class TagBrowser: Gtk.Window {
+  public class TagBrowser: Window {
 
     private TagDB database;
 
@@ -185,12 +167,29 @@ namespace tagster {
 
       #region events
 
+      cbListing.Changed += (object sender, EventArgs e) => {
+        List<TFile> newFiles = null;
+        switch(cbListing.ActiveText) {
+          case "All":
+            newFiles = database.ListFiles();
+            break;
+          case "Tagged":
+            newFiles = database.ListFiles(true);
+            break;
+          case "Untagged":
+            newFiles = database.ListFiles(false);
+            break;
+        }
+        ((FileTaggerList)tree.Model).FileList = newFiles;
+      };
+
       tree.Selection.Changed += (object o, EventArgs args) => {
         var s = SelectedFile();
-        if(s != null)
+        if(s != null) {
           tagGrid.Tags = database.TagsForFile(s);
-        if(MPV != null) 
-          MPV.LoadPlayer(new Viewer(System.IO.Path.Combine("/media/holly/webop/movies-watched", s.File)));
+          if(MPV != null) 
+            MPV.LoadPlayer(new Viewer(System.IO.Path.Combine(Tagster.RepositoryRoot, s.File)));
+        }
       };
         
       tagGrid.TagChange += (object sender, Tag e) => {

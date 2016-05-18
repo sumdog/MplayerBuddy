@@ -13,16 +13,18 @@ namespace tagster {
 
     private readonly static MPVWindow mpv = new MPVWindow();
 
+    public readonly static string RepositoryRoot = "/media/holly/webop/movies-watched";
+
     public static void Main(string[] args) {
       Application.Init();
 
       if(args.Length > 0) {
         switch(args[0]) {
           case "import":
-            System.IO.Directory.GetFiles("/media/holly/webop/movies-watched").ToList().ForEach( f => db.AddFile(f) );
+            System.IO.Directory.GetFiles(RepositoryRoot).ToList().ForEach( f => db.AddFile(f) );
             break;
           case "restore":
-            File.OpenText("/media/holly/webop/movies-watched/tags").ReadToEnd().Split('\n').ToList().ForEach( line => {
+            File.OpenText(String.Format("{0}/tags", RepositoryRoot)).ReadToEnd().Split('\n').ToList().ForEach( line => {
               var parts = line.Split( new string[]{"--"}, StringSplitOptions.RemoveEmptyEntries );
               if(parts.Length == 2) {
 
