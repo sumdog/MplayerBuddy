@@ -7,16 +7,20 @@ using System.Linq;
 namespace tagster {
   class Tagster {
 
-    private readonly static TagDB db = new TagDB();
+    private static TagDB db;
 
-    private readonly static TagBrowser gui = new TagBrowser();
+    private static TagBrowser gui;
 
-    private readonly static MPVWindow mpv = new MPVWindow();
+    private static MPVWindow mpv;
 
     public readonly static string RepositoryRoot = "/media/holly/webop/movies-watched";
 
     public static void Main(string[] args) {
       Application.Init();
+
+      gui = new TagBrowser();
+      mpv = new MPVWindow();
+      db = new TagDB();
 
       if(args.Length > 0) {
         switch(args[0]) {

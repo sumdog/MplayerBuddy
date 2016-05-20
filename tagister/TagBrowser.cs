@@ -82,7 +82,7 @@ namespace tagster {
       Cols = 5;
     }
 
-    private Gtk.Table grid;
+    private Table grid;
 
     public event EventHandler<Tag> TagChange;
 
