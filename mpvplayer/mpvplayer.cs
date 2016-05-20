@@ -181,14 +181,14 @@ namespace org.penguindreams.MplayerBuddy {
           case 3:
             WriteCommand("osd-msg-bar", new string[]{ "cycle" , "pause" });
             break;
-          case 4:
-            if(BackMouseButton != null) {
-              BackMouseButton(this, e);  
-            }
-            break;
-          case 5:
+          case 8:
             if(FrontMouseButton != null) {
               FrontMouseButton(this, e);
+            }
+            break;
+          case 9:
+            if(BackMouseButton != null) {
+              BackMouseButton(this, e);  
             }
             break;
         }

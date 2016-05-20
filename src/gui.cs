@@ -21,7 +21,7 @@ namespace org.penguindreams.MplayerBuddy {
 
   public class Gui : Window {
 
-    private TreeView tree;
+    private PlayerTree tree;
 
     private ScrolledWindow scroller;
 
@@ -39,6 +39,8 @@ namespace org.penguindreams.MplayerBuddy {
 
       //event handlers
       this.DeleteEvent += windowClosed;
+      MplayerBuddy.mpv.BackMouseButton += (object sender, EventArgs e) => tree.PrevVideo();
+      MplayerBuddy.mpv.FrontMouseButton += (object sender, EventArgs e) => tree.NextVideo();
 
       //window scrolling support
       scroller = new ScrolledWindow();

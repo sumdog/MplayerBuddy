@@ -63,6 +63,40 @@ namespace org.penguindreams.MplayerBuddy {
 
     }
 
+    public void NextVideo() {
+      TreeIter i;
+      Selection.GetSelected(out i);
+      if(playlist.IterNext(ref i)) {
+        Selection.SelectIter(i);
+        ((Player)Model.GetValue(i, 0)).startPlayer();
+      }
+    }
+
+    public void PrevVideo() {
+      TreeIter selected, top, prev;
+      Selection.GetSelected(out selected);
+      playlist.GetIterFirst(out top);
+
+      if(Model.GetValue(top, 0).Equals(Model.GetValue(selected, 0))) {
+        Console.WriteLine("At Top");
+      }
+      else {
+        prev = top;
+        while(playlist.IterNext(ref top)) {
+          if(Model.GetValue(top, 0).Equals(Model.GetValue(selected, 0))) {
+            Selection.SelectIter(prev);
+            ((Player)Model.GetValue(prev, 0)).startPlayer();
+            break;
+          }
+          else {
+            prev = top;
+          }
+        }
+      }
+
+
+    }
+
     protected override bool OnButtonPressEvent(Gdk.EventButton evnt) {
       //we need to do this first so we get the current
       //item and not the previous item in the tree

@@ -55,14 +55,14 @@ namespace org.penguindreams.MplayerBuddy {
         errorOnLoad("Could not create/open config file.");
       }
 
-      //create main window
-      gui = new Gui(play);
-      gui.ShowAll();
-			
       mpv = new MPVWindow();
       mpv.ShowAll();
       mpv.MpvCommand = MplayerBuddy.conf.mplayerCommand;
 
+      //create main window
+      gui = new Gui(play);
+      gui.ShowAll();
+			
       //save playlist ever 10 seconds
       GLib.Timeout.Add(10000, new GLib.TimeoutHandler(savePlaylist));
 
