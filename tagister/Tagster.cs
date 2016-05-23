@@ -31,7 +31,19 @@ namespace tagster {
       if(args.Length > 0) {
         switch(args[0]) {
           case "import":
-            System.IO.Directory.GetFiles(RepositoryRoot).ToList().ForEach( f => db.AddFile(f) );
+            var currentFiles = db.ListFiles().Select( f => f.File ).ToArray();
+            //new FileInfo(file).Name
+            //db.AddFile(f)
+            System.IO.Directory.GetFiles(RepositoryRoot).ToList().ForEach( f => {
+              var filename = new FileInfo(f).Name;
+              if(!currentFiles.Contains(filename)) {
+                db.AddFile(filename);
+                Console.WriteLine(String.Format("Adding {0}", filename));
+              }
+              else {
+                Console.WriteLine(String.Format("Skipping {0}", filename));
+              }
+            });
             break;
           case "restore":
             File.OpenText(String.Format("{0}/tags", RepositoryRoot)).ReadToEnd().Split('\n').ToList().ForEach( line => {

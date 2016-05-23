@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 namespace tagster {
   
@@ -22,7 +23,7 @@ namespace tagster {
         String line;
         while ((line = inp.ReadLine()) != null)
         {
-          String[] parts = line.Split(':');
+          String[] parts = line.Split(':').Select(email => email.Trim()).ToArray();
 
           if (parts[0].Equals("RepositoryPath"))
           {
