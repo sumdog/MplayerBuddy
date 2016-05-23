@@ -13,14 +13,20 @@ namespace tagster {
 
     private static MPVWindow mpv;
 
-    public readonly static string RepositoryRoot = "/media/holly/webop/movies-watched";
+    private static Config config;
+
+    public readonly static String home = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+
+    public static string RepositoryRoot;
 
     public static void Main(string[] args) {
       Application.Init();
 
       gui = new TagBrowser();
       mpv = new MPVWindow();
-      db = new TagDB();
+      db = new TagDB(Path.Combine(home, ".tagster/tagster.sqlite3"));
+      config = new Config(Path.Combine(home,".tagster/config"));
+      RepositoryRoot = config.RepositoryPath;
 
       if(args.Length > 0) {
         switch(args[0]) {

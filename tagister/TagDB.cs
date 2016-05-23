@@ -9,8 +9,6 @@ namespace tagster {
   
   public class TagDB {
 
-    string Home = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-
     private SqliteConnection conn;
 
     private List<Dictionary<string,object>> RunSQL(string sql, List<object> args = null) {
@@ -40,9 +38,7 @@ namespace tagster {
       }
     }
 
-    public TagDB() {
-
-      var dbFile = Path.Combine(Home, ".tagster/tagster.sqlite3");
+    public TagDB(string dbFile) {
 
       if(!File.Exists(dbFile)) {
         SqliteConnection.CreateFile(dbFile);

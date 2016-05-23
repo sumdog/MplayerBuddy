@@ -54,6 +54,7 @@
     <Compile Include="TagDB.cs" />
     <Compile Include="Models.cs" />
     <Compile Include="Events.cs" />
+    <Compile Include="Config.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

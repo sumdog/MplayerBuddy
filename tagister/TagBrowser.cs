@@ -4,7 +4,16 @@ using System.Collections.Generic;
 using org.penguindreams.MplayerBuddy;
 
 namespace tagster {
+
+  public class DisplayMessage {
   
+    public static void ShowError(string msg) {
+      var m = new MessageDialog(new Gtk.Window("Error"),DialogFlags.Modal,MessageType.Error,ButtonsType.Ok,msg);
+      m.Run();
+      m.Destroy();
+    }
+
+  }
 
   public class UserInputDialog : Dialog {
 
@@ -34,9 +43,7 @@ namespace tagster {
           switch((ResponseType) dialog.Run()) {
             case ResponseType.Ok:
               if(dialog.UserInput.Text.Trim() == "") {
-                var m = new MessageDialog(new Gtk.Window("Invalid Tag"),DialogFlags.Modal,MessageType.Error,ButtonsType.Ok,"Invalid Tag");
-                m.Run();
-                m.Destroy();
+                DisplayMessage.ShowError("Invalid Tag");
               }
               else {
                 if(NewTag != null) {
@@ -200,12 +207,18 @@ namespace tagster {
 
       var bottomNav = new BottomNav();
       bottomNav.NewTag += (object sender, Tag e) => {
-        Database.AddTag(e.Name);
-        var s = SelectedFile();
-        if(s != null)
-          tagGrid.Tags = database.TagsForFile(s);
-        else
-          tagGrid.Tags = Database.Tags;
+
+        if(Database.Tags.Find( t => t.Name == e.Name ) != null) {
+          DisplayMessage.ShowError("Tag already exists");
+        }
+        else {
+          Database.AddTag(e.Name);
+          var s = SelectedFile();
+          if(s != null)
+            tagGrid.Tags = database.TagsForFile(s);
+          else
+            tagGrid.Tags = Database.Tags;
+        }
       };
 
       #endregion
