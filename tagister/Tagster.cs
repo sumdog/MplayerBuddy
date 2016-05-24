@@ -3,6 +3,7 @@ using System.IO;
 using Gtk;
 using org.penguindreams.MplayerBuddy;
 using System.Linq;
+using Mono.Unix;
 
 namespace tagster {
   class Tagster {
@@ -30,10 +31,26 @@ namespace tagster {
 
       if(args.Length > 0) {
         switch(args[0]) {
+          case "createlinks":
+            db.ListFiles().ForEach( file => {
+              db.TagsForFile(file).ForEach( tag => {
+                
+                var destDir = Path.Combine(config.LinksPath, tag.Name);
+                var destFile = Path.Combine(destDir, file.File);
+
+                Directory.CreateDirectory(destDir);
+                UnixFileInfo target = new UnixFileInfo(Path.Combine(config.RepositoryPath, file.File));
+                if(tag.Set && !File.Exists(destFile)) {
+                  Console.WriteLine(String.Format("Creating New Link {0} -> {1}", target.FullName, destFile));
+                  target.CreateSymbolicLink(destFile);
+                }
+
+              });
+            });
+            break;
           case "import":
             var currentFiles = db.ListFiles().Select( f => f.File ).ToArray();
-            //new FileInfo(file).Name
-            //db.AddFile(f)
+
             System.IO.Directory.GetFiles(RepositoryRoot).ToList().ForEach( f => {
               var filename = new FileInfo(f).Name;
               if(!currentFiles.Contains(filename)) {
@@ -44,6 +61,7 @@ namespace tagster {
                 Console.WriteLine(String.Format("Skipping {0}", filename));
               }
             });
+
             break;
           case "restore":
             File.OpenText(String.Format("{0}/tags", RepositoryRoot)).ReadToEnd().Split('\n').ToList().ForEach( line => {
