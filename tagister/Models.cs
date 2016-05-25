@@ -72,11 +72,6 @@ namespace tagster {
     }
   }
 
-  public class FileTags {
-    public TFile File { get; set; }
-    public List<Tag> Tags { get; set; }
-  }
-
   public class TFile {
     public long Id { get; set; }
     public string File { get; set; }

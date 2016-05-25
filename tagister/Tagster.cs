@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
 using Gtk;
 using org.penguindreams.MplayerBuddy;
 using System.Linq;
@@ -31,6 +32,11 @@ namespace tagster {
 
       if(args.Length > 0) {
         switch(args[0]) {
+          case "tagcount":
+            foreach(KeyValuePair<string,long> e in db.TagUsage()) {
+              Console.WriteLine(String.Format("{0}:\t{1}", e.Key, e.Value));
+            }
+            break;
           case "createlinks":
             db.ListFiles().ForEach( file => {
               db.TagsForFile(file).ForEach( tag => {

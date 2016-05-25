@@ -58,7 +58,7 @@ namespace tagster {
     }
 
     public void AddFile(string file) {
-      RunSQL("INSERT INTO files(name) VALUES(@0)", new List<object> { new FileInfo(file).Name });
+      RunSQL("INSERT INTO files(name) VALUES(@0)", new List<object> { file });
     }
 
     public void AddTag(string tag) {
@@ -69,6 +69,12 @@ namespace tagster {
       RunSQL((tag.Set) ? 
         "INSERT INTO filetags(file_id, tag_id) VALUES(@0, @1)" : 
         "DELETE FROM filetags WHERE file_id=@0 AND tag_id=@1", new List<object> {file.Id, tag.Id} );
+    }
+
+    public Dictionary<String,long> TagUsage() {
+      return RunSQL(@"SELECT t.tag AS tag, count(ft.tag_id) AS count FROM tags t
+        LEFT JOIN filetags ft ON t.id=ft.tag_id
+        GROUP BY t.id").ToDictionary( row => row["tag"].ToString(), row => Convert.ToInt64(row["count"]));
     }
 
     public List<Tag> TagsForFile(TFile file) {
