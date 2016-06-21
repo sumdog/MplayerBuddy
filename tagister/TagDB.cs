@@ -51,6 +51,11 @@ namespace tagster {
       RunSQL("CREATE TABLE IF NOT EXISTS filetags(file_id INT NOT NULL, tag_id INT NOT NULL, UNIQUE(file_id, tag_id), FOREIGN KEY(file_id) REFERENCES files(id), FOREIGN KEY(tag_id) REFERENCES tags(id))");
     }
 
+    ~TagDB() {
+      if(conn != null)
+        conn.Close();
+    }
+
     public List<Tag> Tags {
       get {
         return RunSQL("SELECT * FROM tags").Select( row => new Tag() { Id = Convert.ToInt64(row["id"]), Name = row["tag"].ToString(), Set = false } ).ToList(); 
